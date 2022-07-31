@@ -1,0 +1,7 @@
+/solidity/.deps/
+/solidity/contracts/artifacts/
+/solidity/contracts/IFNFT.sol
+/solidity/contracts/random.sol
+/web/.vscode/
+/web/.idea/
+/web/.husky/

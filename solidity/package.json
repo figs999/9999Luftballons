@@ -1,0 +1,23 @@
+{
+  "name": "9999luftballons",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/figs999/9999Luftballons.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/figs999/9999Luftballons/issues"
+  },
+  "homepage": "https://github.com/figs999/9999Luftballons#readme",
+  "dependencies": {
+    "twitter": "^1.7.1",
+    "twitter-api-v2": "^1.12.3"
+  }
+}
