@@ -28,20 +28,6 @@ export default function WalletConnect() {
               >
                 <Menu.Items className="absolute -right-20 mt-3 w-72 origin-top-right rounded-lg bg-white shadow-large dark:bg-gray-900 sm:-right-14">
                   <Menu.Item>
-                    <div className="border-b border-dashed border-gray-200 p-3 dark:border-gray-700">
-                      <ActiveLink
-                        href="/profile"
-                        className="flex items-center gap-3 rounded-lg py-2.5 px-3 text-sm font-medium text-gray-900 transition hover:bg-gray-50 dark:text-white dark:hover:bg-gray-800"
-                      >
-                        <span className="h-8 w-8 rounded-full border-2 border-solid border-white bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 dark:border-gray-700"></span>
-                        <span className="grow uppercase">
-                          View Your Profile
-                        </span>
-                        <ChevronForward />
-                      </ActiveLink>
-                    </div>
-                  </Menu.Item>
-                  <Menu.Item>
                     <Menu.Item>
                       <div className="border-b border-dashed border-gray-200 px-6 py-5 dark:border-gray-700">
                         <div className="flex items-center justify-between gap-3">
@@ -75,10 +61,6 @@ export default function WalletConnect() {
               </Transition>
             </Menu>
           </div>
-
-          <ActiveLink href="/create-nft">
-            <Button className="shadow-main hover:shadow-large">CREATE</Button>
-          </ActiveLink>
         </div>
       ) : (
         <Button

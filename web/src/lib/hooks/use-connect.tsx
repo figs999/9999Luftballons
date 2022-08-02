@@ -232,10 +232,10 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const getBalance = async (walletAddress: string) => {
-    const walletBalance = await Luftballons_balanceOf(walletAddress);
+    const walletBalance = await provider?.getBalance(walletAddress) ?? 0;
     const balanceInEth = ethers.utils.formatEther(walletBalance);
     console.log(walletBalance);
-    setBalance(walletBalance.toString());
+    setBalance(balanceInEth.toString());
     await ERC20_userBalances(walletAddress);
   };
 
@@ -360,6 +360,8 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     balance: string;
     usdBalance: string;
     color?: string;
+    link?: string;
+    text?: string;
   };
 
   const ERC20_airdroppedQuantity = async function(token_address:string): Promise<number> {
@@ -470,14 +472,16 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       }
     }
 
-    let colors:{[contract:string]:{
+    let data:{[contract:string]:{
+        link:string,
+        text:string,
         color:string,
         logo:any
     }} = {
-      "0x356e1363897033759181727e4bff12396c51a7e0": {color: '#FD7474', logo: LuftballonsImage},
-      "0xb9f7dba05880100083278156ab24d5fc036c3bb8": {color: '#8199e1', logo: LUFTImage},
-      "0x6e946833aa67eaf849927817f25f0d2f04064499": {color: '#cDa484', logo: NFTxImage},
-      "0x46bffbcc49bab96345717a7b83edc75c82a814bf": {color: '#aD84f4', logo: xLUFTImage},
+      "0x356e1363897033759181727e4bff12396c51a7e0": {color: '#FD7474', logo: LuftballonsImage, text:"Buy on Opensea", link:"https://opensea.io/collection/9999-luftballons"},
+      "0xb9f7dba05880100083278156ab24d5fc036c3bb8": {color: '#8199e1', logo: LUFTImage, text: "Harvest Luft", link:""},
+      "0x6e946833aa67eaf849927817f25f0d2f04064499": {color: '#cDa484', logo: NFTxImage, text: "Manage NFTx LP", link:"https://nftx.io/vault/0x6e946833aa67eaf849927817f25f0d2f04064499/stake/"},
+      "0x46bffbcc49bab96345717a7b83edc75c82a814bf": {color: '#aD84f4', logo: xLUFTImage, text: "Un-Stake on NFTx", link:"https://nftx.io/vault/0x6e946833aa67eaf849927817f25f0d2f04064499/stake/"},
     }
 
     addresses = addresses.reverse();
@@ -493,12 +497,22 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       cards.push({
         id: contract,
         name: result.metadata?.name ?? "",
-        symbol: contract=='0x6e946833aa67eaf849927817f25f0d2f04064499'?"NFTx":result.metadata?.symbol ?? "",
+        symbol: result.metadata?.symbol ?? "",
         balance: (+result.value).toFixed(5),
         usdBalance: (result.price?.usdPrice??0 * result.value).toString(),
-        logo: colors[contract].logo,
-        color: colors[contract].color
+        logo: data[contract].logo,
+        color: data[contract].color,
+        text: data[contract].text,
+        link: data[contract].link
       })
+      
+      if(contract == '0x6e946833aa67eaf849927817f25f0d2f04064499') {
+        cards[cards.length-1].symbol = "LUFT-LP";
+        cards[cards.length-1].name = "NFTx Luftballons LP";
+      }
+      else if(contract == '0x46bffbcc49bab96345717a7b83edc75c82a814bf') {
+        cards[cards.length-1].name = "NFTx Luftballons Stake";
+      }
     }
 
     console.log(`BLOOP!: ${cards[3].balance}`);

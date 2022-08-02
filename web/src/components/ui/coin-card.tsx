@@ -3,6 +3,7 @@ import { ArrowUp } from '@/components/icons/arrow-up';
 import { Scrollbar, A11y } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { StaticImageData } from 'next/image';
+import TopupButton from "@/components/ui/topup-button";
 
 type CoinCardProps = {
   id: string;
@@ -12,6 +13,8 @@ type CoinCardProps = {
   balance: string;
   usdBalance: string;
   color?: string;
+  link?: string;
+  text?: string;
 };
 
 export function CoinCard({
@@ -21,6 +24,8 @@ export function CoinCard({
   balance,
   usdBalance,
   color = '#FDEDD4',
+  link,
+  text
 }: CoinCardProps) {
   return (
     <div
@@ -46,6 +51,10 @@ export function CoinCard({
       <div className="flex items-center justify-between text-xs font-medium 2xl:text-sm">
         <span className="tracking-wider text-gray-600">{usdBalance} USD</span>
       </div>
+      <br/>
+      <div>
+        <TopupButton link={link} text={text} />
+      </div>
     </div>
   );
 }
@@ -57,19 +66,19 @@ interface CoinSliderProps {
 export default function CoinSlider({ coins }: CoinSliderProps) {
   const sliderBreakPoints = {
     768: {
-      slidesPerView: 2,
+      slidesPerView: 4,
       spaceBetween: 20,
     },
     1080: {
-      slidesPerView: 3,
+      slidesPerView: 4,
       spaceBetween: 24,
     },
     1280: {
-      slidesPerView: 2,
+      slidesPerView: 4,
       spaceBetween: 24,
     },
     1700: {
-      slidesPerView: 3,
+      slidesPerView: 4,
       spaceBetween: 24,
     },
     2200: {
@@ -99,6 +108,8 @@ export default function CoinSlider({ coins }: CoinSliderProps) {
               balance={coin.balance}
               usdBalance={coin.usdBalance}
               color={coin.color}
+              text={coin.text}
+              link={coin.link}
             />
           </SwiperSlide>
         ))}
