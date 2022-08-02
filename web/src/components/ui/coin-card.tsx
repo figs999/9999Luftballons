@@ -11,8 +11,6 @@ type CoinCardProps = {
   logo: StaticImageData;
   balance: string;
   usdBalance: string;
-  change: string;
-  isChangePositive: boolean;
   color?: string;
 };
 
@@ -22,8 +20,6 @@ export function CoinCard({
   logo,
   balance,
   usdBalance,
-  change,
-  isChangePositive,
   color = '#FDEDD4',
 }: CoinCardProps) {
   return (
@@ -49,20 +45,6 @@ export function CoinCard({
       </div>
       <div className="flex items-center justify-between text-xs font-medium 2xl:text-sm">
         <span className="tracking-wider text-gray-600">{usdBalance} USD</span>
-        <span
-          className={`flex items-center  ${
-            isChangePositive ? 'text-green-500' : 'text-red-500'
-          }`}
-        >
-          <span
-            className={`ltr:mr-2 rtl:ml-2 ${
-              !isChangePositive ? 'rotate-180' : ''
-            }`}
-          >
-            <ArrowUp />
-          </span>
-          {change}
-        </span>
       </div>
     </div>
   );
@@ -116,8 +98,6 @@ export default function CoinSlider({ coins }: CoinSliderProps) {
               logo={coin.logo}
               balance={coin.balance}
               usdBalance={coin.usdBalance}
-              change={coin.change}
-              isChangePositive={coin.isChangePositive}
               color={coin.color}
             />
           </SwiperSlide>
