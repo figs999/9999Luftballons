@@ -339,10 +339,9 @@ const SearchPage: NextPageWithLayout<
             {NFTList.map((nft) => (
               <NFTGrid
                 key={nft.id}
+                id={nft.id}
                 name={nft.name}
-                image={nft.image}
-                author={nft.author}
-                authorImage={nft.authorImage}
+                image_url={nft.image.src}
                 price={nft.price}
                 collection={nft.collection}
               />

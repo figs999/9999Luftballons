@@ -1,14 +1,11 @@
-/** @type {import('next').NextConfig} */
-
-const withPWA = require('next-pwa');
 const runtimeCaching = require('next-pwa/cache');
 
-module.exports = withPWA({
+/*module.exports = withPWA({
   reactStrictMode: true,
   pwa: {
     dest: 'public',
     disable: process.env.NODE_ENV === 'development',
-    runtimeCaching,
+    runtimeCaching
   },
   ...(process.env.NODE_ENV === 'production' && {
     typescript: {
@@ -18,4 +15,16 @@ module.exports = withPWA({
       ignoreDuringBuilds: true,
     },
   }),
-});
+});*/
+
+module.exports = {
+  reactStrictMode: true,
+  images: {
+    domains: [
+      'lh3.googleusercontent.com',
+      '*.googleusercontent.com',
+      'googleusercontent.com:*',
+      '*.googleusercontent.com:*'
+    ]
+  }
+}

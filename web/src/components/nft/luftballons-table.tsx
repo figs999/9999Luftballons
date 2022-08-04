@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, {useContext, useEffect} from 'react';
 import cn from 'classnames';
 import {
   useTable,
@@ -16,6 +16,11 @@ import { LinkIcon } from '@/components/icons/link-icon';
 import { TransactionData } from '@/data/static/transaction-data';
 import { useBreakpoint } from '@/lib/hooks/use-breakpoint';
 import { useIsMounted } from '@/lib/hooks/use-is-mounted';
+import {NFTList} from "@/data/static/nft-list";
+import NFTGrid from "@/components/ui/nft-card";
+import {nft, WalletContext, WalletProvider} from "@/lib/hooks/use-connect";
+import AuthorImage from "@/assets/images/author.jpg";
+import NFT1 from "@/assets/images/nft/nft-1.jpg";
 
 const COLUMNS = [
   {
@@ -124,6 +129,7 @@ export default function TransactionTable() {
   );
 
   const { pageIndex } = state;
+  const { userLuftballons } = useContext(WalletContext);
 
   return (
     <div className="">
@@ -134,114 +140,28 @@ export default function TransactionTable() {
           </h2>
         </div>
       </div>
+      {userLuftballons.length > 0 ? (
       <div className="-mx-0.5">
-        <Scrollbar style={{ width: '100%' }}>
-          <div className="px-0.5">
-            <table
-              {...getTableProps()}
-              className="transaction-table w-full border-separate border-0"
-            >
-              <thead className="text-sm text-gray-500 dark:text-gray-300">
-                {headerGroups.map((headerGroup, idx) => (
-                  <tr {...headerGroup.getHeaderGroupProps()} key={idx}>
-                    {headerGroup.headers.map((column, idx) => (
-                      <th
-                        {...column.getHeaderProps(
-                          column.getSortByToggleProps()
-                        )}
-                        key={idx}
-                        className="group bg-white px-2 py-5 font-normal first:rounded-bl-lg last:rounded-br-lg ltr:first:pl-8 ltr:last:pr-8 rtl:first:pr-8 rtl:last:pl-8 dark:bg-light-dark md:px-4"
-                      >
-                        <div className="flex items-center">
-                          {column.render('Header')}
-                          {column.canResize && (
-                            <div
-                              {...column.getResizerProps()}
-                              className={`resizer ${
-                                column.isResizing ? 'isResizing' : ''
-                              }`}
-                            />
-                          )}
-                          <span className="ltr:ml-1 rtl:mr-1">
-                            {column.isSorted ? (
-                              column.isSortedDesc ? (
-                                <ChevronDown />
-                              ) : (
-                                <ChevronDown className="rotate-180" />
-                              )
-                            ) : (
-                              <ChevronDown className="rotate-180 opacity-0 transition group-hover:opacity-50" />
-                            )}
-                          </span>
-                        </div>
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody
-                {...getTableBodyProps()}
-                className="text-xs font-medium text-gray-900 dark:text-white 3xl:text-sm"
-              >
-                {page.map((row, idx) => {
-                  prepareRow(row);
-                  return (
-                    <tr
-                      {...row.getRowProps()}
-                      key={idx}
-                      className="mb-3 items-center rounded-lg bg-white uppercase shadow-card last:mb-0 dark:bg-light-dark"
-                    >
-                      {row.cells.map((cell, idx) => {
-                        return (
-                          <td
-                            {...cell.getCellProps()}
-                            key={idx}
-                            className="px-2 py-4 tracking-[1px] ltr:first:pl-4 ltr:last:pr-4 rtl:first:pr-8 rtl:last:pl-8 md:px-4 md:py-6 md:ltr:first:pl-8 md:ltr:last:pr-8 3xl:py-5"
-                          >
-                            {cell.render('Cell')}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </Scrollbar>
-      </div>
-      <div className="mt-3 flex items-center justify-center rounded-lg bg-white px-5 py-4 text-sm shadow-card dark:bg-light-dark lg:py-6">
-        <div className="flex items-center gap-5">
-          <Button
-            onClick={() => previousPage()}
-            disabled={!canPreviousPage}
-            title="Previous"
-            shape="circle"
-            variant="transparent"
-            size="small"
-            className="text-gray-700 disabled:text-gray-400 dark:text-white disabled:dark:text-gray-400"
-          >
-            <LongArrowLeft className="h-auto w-4 rtl:rotate-180" />
-          </Button>
-          <div>
-            Page{' '}
-            <strong className="font-semibold">
-              {pageIndex + 1} of {pageOptions.length}
-            </strong>{' '}
-          </div>
-          <Button
-            onClick={() => nextPage()}
-            disabled={!canNextPage}
-            title="Next"
-            shape="circle"
-            variant="transparent"
-            size="small"
-            className="text-gray-700 disabled:text-gray-400 dark:text-white disabled:dark:text-gray-400"
-          >
-            <LongArrowRight className="h-auto w-4 rtl:rotate-180 " />
-          </Button>
+        <div
+            className='grid gap-5 sm:grid-cols-2 md:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5'
+        >
+          {userLuftballons.map((NFT:nft) => (
+              <NFTGrid
+                  key={NFT.id}
+                  image_url={NFT.image_url??""}
+                  thumbnail_url={NFT.thumbnail_url}
+                  price={NFT.price}
+                  collection={NFT.collection}
+                  id={NFT.id}
+                  name={NFT.name}
+                  collection_metadata={NFT.collection_metadata}
+              />
+          ))}
         </div>
       </div>
+          ) : (
+      <div/>
+          )}
     </div>
   );
 }

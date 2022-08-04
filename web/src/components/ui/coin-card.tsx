@@ -4,14 +4,16 @@ import { Scrollbar, A11y } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { StaticImageData } from 'next/image';
 import TopupButton from "@/components/ui/topup-button";
+import {useContext} from "react";
+import {WalletContext} from "@/lib/hooks/use-connect";
 
 type CoinCardProps = {
   id: string;
   name: string;
   symbol: string;
   logo: StaticImageData;
-  balance: string;
-  usdBalance: string;
+  balance: number;
+  usdBalance: number;
   color?: string;
   link?: string;
   text?: string;
@@ -27,6 +29,9 @@ export function CoinCard({
   link,
   text
 }: CoinCardProps) {
+
+  const { claimableLuft } = useContext(WalletContext);
+
   return (
     <div
       className="relative rounded-lg p-6 xl:p-8"
@@ -45,12 +50,20 @@ export function CoinCard({
         />
       </div>
       <div className="mt-8 mb-2 text-sm font-medium tracking-wider text-gray-900 lg:text-lg 2xl:text-xl 3xl:text-2xl">
-        {balance}
+        {symbol == "LUFTBALLONS" ? (+balance).toFixed(0) : (+balance).toFixed(5)}
         <span className="uppercase"> {symbol}</span>
       </div>
-      <div className="flex items-center justify-between text-xs font-medium 2xl:text-sm">
-        <span className="tracking-wider text-gray-600">{usdBalance} USD</span>
-      </div>
+      {symbol == "LUFT" ? (
+          <div>
+            <div className="mt-2 flex items-center justify-between text-xs font-medium 2xl:text-sm">
+              <span className="tracking-wider text-gray-600">Harvestable: {claimableLuft.toFixed(3)}</span>
+            </div>
+          </div>
+      ):(
+          <div className="flex items-center justify-between text-xs font-medium 2xl:text-sm">
+            <span className="tracking-wider text-gray-600">{(usdBalance*balance).toFixed(2)} ({(+usdBalance).toFixed(2)}) USD</span>
+          </div>
+      )}
       <br/>
       <div>
         <TopupButton link={link} text={text} />
@@ -88,32 +101,34 @@ export default function CoinSlider({ coins }: CoinSliderProps) {
   };
 
   return (
-    <div>
-      <Swiper
-        modules={[Scrollbar, A11y]}
-        spaceBetween={24}
-        slidesPerView={1}
-        scrollbar={{ draggable: true }}
-        breakpoints={sliderBreakPoints}
-        observer={true}
-        dir="ltr"
-      >
-        {coins.map((coin) => (
-          <SwiperSlide key={coin.id}>
-            <CoinCard
-              id={coin.id}
-              name={coin.name}
-              symbol={coin.symbol}
-              logo={coin.logo}
-              balance={coin.balance}
-              usdBalance={coin.usdBalance}
-              color={coin.color}
-              text={coin.text}
-              link={coin.link}
-            />
-          </SwiperSlide>
-        ))}
-      </Swiper>
-    </div>
+      <div>
+        {coins.length > 0 ? (
+          <Swiper
+            modules={[Scrollbar, A11y]}
+            spaceBetween={24}
+            slidesPerView={1}
+            scrollbar={{ draggable: true }}
+            breakpoints={sliderBreakPoints}
+            observer={true}
+            dir="ltr"
+          >
+            {coins.map((coin) => (
+              <SwiperSlide key={coin.id}>
+                <CoinCard
+                  id={coin.id}
+                  name={coin.name}
+                  symbol={coin.symbol}
+                  logo={coin.logo}
+                  balance={coin.balance}
+                  usdBalance={coin.usdBalance}
+                  color={coin.color}
+                  text={coin.text}
+                  link={coin.link}
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        ):(<div/>)}
+      </div>
   );
 }

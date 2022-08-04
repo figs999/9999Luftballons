@@ -68,11 +68,11 @@ const menuItems = [
     dropdownItems: [
       {
         name: 'Manage MY NFT Project',
-        href: routes.home,
+        href: routes.vote,
       },
       {
         name: 'Manage ERC20 Luftdrop',
-        href: routes.home,
+        href: routes.vote,
       },
       {
         name: 'How to Send?',
