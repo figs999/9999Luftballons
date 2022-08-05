@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { Dialog } from '@/components/ui/dialog';
 import { Transition } from '@/components/ui/transition';
 import { DRAWER_VIEW, useDrawer } from '@/components/drawer-views/context';
-import { DrawerFilters } from '@/pages/search';
+import { DrawerFilters } from '@/pages/nft-drops';
 
 const Sidebar = dynamic(() => import('@/layouts/dashboard/_sidebar'));
 const DrawerMenu = dynamic(() => import('@/layouts/_layout-menu'));

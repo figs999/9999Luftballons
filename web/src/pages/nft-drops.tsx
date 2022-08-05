@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import {Dispatch, SetStateAction, useContext, useEffect, useState} from 'react';
 import { atom, useAtom } from 'jotai';
 import { NextSeo } from 'next-seo';
-import type { GetStaticProps, InferGetStaticPropsType } from 'next';
+import type {GetServerSideProps, GetStaticProps, InferGetServerSidePropsType, InferGetStaticPropsType} from 'next';
 import type { NextPageWithLayout } from '@/types';
 import Slider from 'rc-slider';
 import { motion } from 'framer-motion';
@@ -20,6 +20,8 @@ import Scrollbar from '@/components/ui/scrollbar';
 import Button from '@/components/ui/button';
 import { Close } from '@/components/icons/close';
 import { NFTList } from '@/data/static/nft-list';
+import {nft, WalletContext, ServerSide_AvailableNFTs} from "@/lib/hooks/use-connect";
+import Moralis from "moralis";
 
 const gridCompactViewAtom = atom(false);
 function useGridSwitcher() {
@@ -69,20 +71,29 @@ function GridSwitcher() {
 }
 
 const sort = [
-  { id: 1, name: 'Date Listed: Newest' },
-  { id: 2, name: 'Date Listed: Oldest' },
-  { id: 3, name: 'Ending: Soonest' },
-  { id: 4, name: 'Ending: Latest' },
+  { id: 1, name: 'Date Listed: Newest', func: (a:nft,b:nft) => {return b?.date - a?.date} },
+  { id: 2, name: 'Date Listed: Oldest', func: (a:nft,b:nft) => {return a?.date - b?.date} },
+  { id: 3, name: 'LUFT$: Descending', func: (a:nft,b:nft) => {return (a.luft&&b.luft) ? (b.luft - a.luft) : 0} },
+  { id: 4, name: 'LUFT$: Ascending', func: (a:nft,b:nft) => {return (a.luft&&b.luft) ? (a.luft - b.luft) : 0} },
 ];
 
+const sortAtom = atom(sort[0]);
+function useSortSwitcher() {
+  const [sortMethod, setSortMethod] = useAtom(sortAtom);
+  return {
+    sortMethod,
+    setSortMethod,
+  };
+}
+
 function SortList() {
-  const [selectedItem, setSelectedItem] = useState(sort[0]);
+  const {sortMethod, setSortMethod} = useSortSwitcher();
 
   return (
     <div className="relative">
-      <Listbox value={selectedItem} onChange={setSelectedItem}>
+      <Listbox value={sortMethod} onChange={setSortMethod}>
         <Listbox.Button className="flex h-10 w-auto items-center justify-between rounded-lg bg-gray-100 px-4 text-xs text-gray-900 dark:bg-gray-800 dark:text-white sm:w-56 sm:text-sm lg:h-11">
-          {selectedItem.name}
+          {sortMethod.name}
           <ChevronDown className="ltr:ml-2 rtl:mr-2" />
         </Listbox.Button>
         <Transition
@@ -283,17 +294,32 @@ export function DrawerFilters() {
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async () => {
   return {
-    props: {},
-  };
-};
+    props: {
+      nfts: await ServerSide_AvailableNFTs()
+    }
+  }
+}
 
-const SearchPage: NextPageWithLayout<
-  InferGetStaticPropsType<typeof getStaticProps>
-> = () => {
+const NFTPage: NextPageWithLayout<
+    InferGetServerSidePropsType<typeof getServerSideProps>
+> = ({nfts}) => {
   const { isGridCompact } = useGridSwitcher();
+  const { sortMethod } = useSortSwitcher();
   const { openDrawer } = useDrawer();
+  const { availableNFTs, NFT_AvailableNFTs, address } = useContext(WalletContext);
+
+  /* This effect will fetch wallet address if user has already connected his/her wallet */
+  useEffect(() => {
+    async function checkLuftCosts() {
+      await NFT_AvailableNFTs(nfts);
+    }
+
+    if(address) checkLuftCosts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address]);
+
   return (
     <>
       <NextSeo
@@ -308,7 +334,7 @@ const SearchPage: NextPageWithLayout<
         <div className="2xl:ltr:pl-10 2xl:rtl:pr-10 4xl:ltr:pl-12 4xl:rtl:pr-12">
           <div className="relative z-10 mb-6 flex items-center justify-between">
             <span className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">
-              5,686,066 items
+              {nfts.length} items
             </span>
 
             <div className="flex gap-6 2xl:gap-8">
@@ -336,14 +362,19 @@ const SearchPage: NextPageWithLayout<
                 : 'grid gap-6 sm:grid-cols-2 md:grid-cols-3 3xl:grid-cols-3 4xl:grid-cols-4'
             }
           >
-            {NFTList.map((nft) => (
+            {availableNFTs.sort(sortMethod.func).map((_nft:nft) => (
               <NFTGrid
-                key={nft.id}
-                id={nft.id}
-                name={nft.name}
-                image_url={nft.image.src}
-                price={nft.price}
-                collection={nft.collection}
+                key={_nft.collection_metadata.address + _nft.id}
+                id={_nft.id}
+                name={_nft.name}
+                image_url={_nft.image_url}
+                thumbnail_url={_nft.thumbnail_url}
+                price={_nft.price}
+                collection={_nft.collection}
+                luft={_nft.luft}
+                metadata={_nft.metadata}
+                collection_metadata={_nft.collection_metadata}
+                date={_nft.date}
               />
             ))}
           </div>
@@ -359,8 +390,8 @@ const SearchPage: NextPageWithLayout<
   );
 };
 
-SearchPage.getLayout = function getLayout(page) {
+NFTPage.getLayout = function getLayout(page) {
   return <DashboardLayout>{page}</DashboardLayout>;
 };
 
-export default SearchPage;
+export default NFTPage;

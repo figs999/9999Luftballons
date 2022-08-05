@@ -3,8 +3,9 @@ import AnchorLink from '@/components/ui/links/anchor-link';
 import { Verified } from '@/components/icons/verified';
 import Avatar from '@/components/ui/avatar';
 import { StaticImageData } from 'next/image';
-import {nft} from "@/lib/hooks/use-connect";
+import {nft, WalletContext} from "@/lib/hooks/use-connect";
 import Button from "@/components/ui/button";
+import {useContext} from "react";
 
 export default function NFTGrid({
     id,
@@ -14,11 +15,17 @@ export default function NFTGrid({
     price,
     luft,
     thumbnail_url,
-    collection_metadata
+    collection_metadata,
+    date
 }: nft) {
-  let claimNFT = async function(collection:string, token:number) {
-
-  }
+    const { txNFT_harvestERC721Airdrop, txNFT_harvestERC1155Airdrop, address, userBalances } = useContext(WalletContext);
+    let claimNFT = async function(collection:string, token:number) {
+        if(collection_metadata.schema_name == "ERC721") {
+            await txNFT_harvestERC721Airdrop(address,collection,token);
+        } else {
+            await txNFT_harvestERC1155Airdrop(address,collection,token,1);
+        }
+    }
 
     const myLoader=(url:string)=>{
         return `${url}`;
@@ -58,11 +65,17 @@ export default function NFTGrid({
           <div className="mt-4 text-sm font-medium text-gray-900 dark:text-white">
             Burn Fee: {luft} $LUFT
             <Button
-                onClick={() => claimNFT(collection, id)}
+                onClick={() => claimNFT(collection_metadata.address, id)}
                 className="shadow-main hover:shadow-large"
+                disabled={userBalances[0] && userBalances[0].balance<luft}
             >
               Claim It!
             </Button>
+          </div>
+        ):(<div/>)}
+        {date ? (
+          <div className="mt-4 text-sm font-medium text-gray-900 dark:text-white">
+              Dropped: {(new Date(date)).toLocaleString('en-US')}
           </div>
         ):(<div/>)}
       </div>

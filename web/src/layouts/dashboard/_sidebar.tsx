@@ -49,7 +49,7 @@ const menuItems = [
   {
     name: 'NFT Luftdrops',
     icon: <CompassIcon />,
-    href: routes.search,
+    href: routes.nftDrops,
   },
   {
     name: 'ERC20 Luftdrops',

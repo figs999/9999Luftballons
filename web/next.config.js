@@ -24,7 +24,9 @@ module.exports = {
       'lh3.googleusercontent.com',
       '*.googleusercontent.com',
       'googleusercontent.com:*',
-      '*.googleusercontent.com:*'
+      '*.googleusercontent.com:*',
+      'openseauserdata.com:*',
+      'openseauserdata.com'
     ]
   }
 }
