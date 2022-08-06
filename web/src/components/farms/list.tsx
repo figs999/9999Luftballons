@@ -1,11 +1,12 @@
 // @ts-nocheck
-import { useState } from 'react';
+import {useContext, useState} from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CurrencySwapIcons from '@/components/ui/currency-swap-icons';
 import { CoinList } from '@/components/ui/currency-swap-icons';
 import TransactionInfo from '@/components/ui/transaction-info';
-import {tokenData} from "@/lib/hooks/use-connect";
+import {tokenData, WalletContext} from "@/lib/hooks/use-connect";
 import CurrencyIcons from "@/components/ui/currency-swap-icons";
+import Button from "@/components/ui/button";
 interface FarmListTypes {
   from: string;
   to: string;
@@ -17,11 +18,12 @@ interface FarmListTypes {
 
 export default function AirdropList({airdrop}: React.PropsWithChildren<{airdrop:tokenData}>) {
   let [isExpand, setIsExpand] = useState(false);
+  const {txERC20_noticeAirdrop, txERC20_harvestAirdrops} = useContext(WalletContext);
+
   return (
     <div className="relative mb-3 overflow-hidden rounded-lg bg-white shadow-card transition-all last:mb-0 hover:shadow-large dark:bg-light-dark">
       <div
         className="relative grid h-auto cursor-pointer grid-cols-2 items-center gap-3 py-4 sm:h-20 sm:grid-cols-5 sm:gap-6 sm:py-0 lg:grid-cols-5"
-        onClick={() => setIsExpand(!isExpand)}
       >
         <div className="col-span-2 px-4 sm:col-auto sm:px-8">
           <CurrencyIcons metadata={airdrop?.metadata} />
@@ -42,13 +44,32 @@ export default function AirdropList({airdrop}: React.PropsWithChildren<{airdrop:
           <span className="mb-1 block font-medium text-gray-600 dark:text-gray-400 sm:hidden">
             Noticed
           </span>
-          {(airdrop?.noticed == airdrop?.value) ? "YES" : "NO"}
+          {(airdrop?.noticed == airdrop?.value) ? "YES" : (
+              <Button
+                  onClick={() => txERC20_noticeAirdrop(airdrop?.metadata?.address ?? "")}
+                  className="shadow-main hover:shadow-large"
+              >
+                NOTICE TO CLAIM
+              </Button>
+          )}
         </div>
         <div className="px-4 text-xs font-medium uppercase tracking-wider text-black dark:text-white sm:px-8 sm:text-sm">
           <span className="mb-1 block font-medium text-gray-600 dark:text-gray-400 sm:hidden">
             Claimable
           </span>
-          {(airdrop?.claimable??0).toPrecision(5)} (${ ((airdrop?.claimable??0) * airdrop?.price?.usdPrice).toPrecision(3)})
+          {(airdrop?.claimable != undefined) ? (
+              <Button
+                  onClick={async () => txERC20_harvestAirdrops(airdrop?.metadata?.address ?? "")}
+                  className="shadow-main hover:shadow-large"
+                  disabled={airdrop.claimable == 0 || airdrop?.noticed != airdrop?.value}
+              >
+                {`${(airdrop?.claimable??0).toPrecision(5)} ($${ ((airdrop?.claimable??0) * airdrop?.price?.usdPrice).toPrecision(3)})`}
+              </Button>
+          ) : (
+            <div>
+              `Calculating...`
+            </div>
+          )}
         </div>
       </div>
       <AnimatePresence initial={false}>

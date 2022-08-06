@@ -59,7 +59,7 @@ export default function NFTGrid({
           {collection}
         </AnchorLink>
         <div className="mt-4 text-sm font-medium text-gray-900 dark:text-white">
-          Est. Value: {price}
+          Last Sale: {price}
         </div>
         {luft ? (
           <div className="mt-4 text-sm font-medium text-gray-900 dark:text-white">

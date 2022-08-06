@@ -1,6 +1,6 @@
 import { useEffect, useState, createContext, ReactNode } from 'react';
 import Web3 from 'web3';
-import {Contract, ethers } from 'ethers';
+import {Contract, ContractReceipt, ethers} from 'ethers';
 // @ts-ignore
 import Web3Modal from "web3modal";
 // @ts-ignore
@@ -26,6 +26,7 @@ import {forEach} from "lodash";
 import AuthorImage from "@/assets/images/author.jpg";
 import NFT1 from "@/assets/images/nft/nft-1.jpg";
 import {Runtime} from "inspector";
+import {ContractTransaction} from "@ethersproject/contracts/src.ts";
 
 const luftballonsAddress = '0x356e1363897033759181727e4bff12396c51a7e0';
 
@@ -146,51 +147,6 @@ export function getChainData(chainId: number): IChainData | undefined {
   }
 
   return chainData;
-}
-
-export async function ServerSide_AvailableNFTs():Promise<nft[]> {
-  let os_url = `https://api.opensea.io/api/v1/assets?owner=${luftballonsAddress}`
-  let result = await axios.get(os_url, {
-    headers: {
-      'Content-Type': 'application/json',
-      'X-API-KEY': process.env.OPEN_SEA ?? ""
-    }
-  });
-
-  let nfts:{[id:number]:nft} = {};
-  let found = 0;
-  for(let nft of result.data?.assets) {
-    nfts[nft.id] = {
-      name: nft.name,
-      id: nft.token_id,
-      collection: nft.collection.name,
-      thumbnail_url: nft.image_thumbnail_url,
-      image_url: nft.image_url,
-      metadata: nft.traits,
-      collection_metadata: nft.asset_contract,
-      price: nft.last_sale ? (
-          (nft.last_sale.total_price * nft.last_sale.payment_token.eth_price) / 10 ** nft.last_sale.payment_token.decimals
-      ) + "e" : "Unknown",
-      //luft: await NFT_LuftPerNFT(nft.asset_contract.address),
-      date: 0
-    };
-    os_url = `https://api.opensea.io/api/v1/events?only_opensea=false&asset_contract_address=${nft.asset_contract.address}&event_type=transfer&token_id=${nft.token_id}`
-    let result2 = await axios.get(os_url, {
-      headers: {
-        'Accept': 'application/json',
-        'X-API-KEY': process.env.OPEN_SEA ?? ""
-      }
-    });
-
-    for (let event of result2.data.asset_events) {
-      if (event.to_account.address == luftballonsAddress) {
-        nfts[nft.id].date = Date.parse(event.event_timestamp);
-        break;
-      }
-    }
-  }
-
-  return Object.values(nfts)
 }
 
 export async function ServerSide_AvailableAirdrops():Promise<{[address:string]:tokenData}> {
@@ -647,16 +603,77 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const [availableNFTs, setAvailableNFTs] = useState<nft[]>([]);
-  const NFT_AvailableNFTs = async function(nfts:nft[]):Promise<nft[]> {
-    setAvailableNFTs(nfts);
+  const NFT_AvailableNFTs = async function():Promise<nft[]> {
 
-    for(let _nft of nfts) {
-      _nft.luft = await NFT_LuftPerNFT(_nft.collection_metadata.address);
-      setAvailableNFTs(nfts);
+    let os_url = `https://api.opensea.io/api/v1/assets?owner=${luftballonsAddress}`
+    let result = await axios.get(os_url, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    let nfts:{[add_id:string]:nft} = {};
+    let nftIDs: { [add_id:string]: {address:string, id:number, date:number}} = {};
+    for(let nft of result.data?.assets) {
+      let add_id = nft.asset_contract.address+nft.token_id;
+      nfts[add_id] = {
+        name: nft.name,
+        id: nft.token_id,
+        collection: nft.collection.name,
+        thumbnail_url: nft.image_thumbnail_url,
+        image_url: nft.image_url,
+        metadata: nft.traits,
+        collection_metadata: nft.asset_contract,
+        price: nft.last_sale ? (
+            (nft.last_sale.total_price * nft.last_sale.payment_token.eth_price) / 10 ** nft.last_sale.payment_token.decimals
+        ) + "e" : "Unknown",
+        //luft: await NFT_LuftPerNFT(nft.asset_contract.address),
+        date: 0
+      };
+
+      nftIDs[add_id] = {
+        address: nft.asset_contract.address,
+        id: nft.token_id,
+        date: 0
+      };
     }
 
-    setAvailableNFTs(nfts);
-    return nfts;
+    let moralisQuery = NFT_GetReceivedDates(nftIDs);
+
+    setAvailableNFTs(Object.values(nfts));
+
+    for(let _nft of Object.values(nfts)) {
+      _nft.luft = await NFT_LuftPerNFT(_nft.collection_metadata.address);
+      setAvailableNFTs(Object.values(nfts));
+    }
+
+    let moralisResult = await moralisQuery;
+
+    for(let add_id of Object.keys(moralisResult)) {
+      nfts[add_id].date = moralisResult[add_id].date
+    }
+
+    setAvailableNFTs(Object.values(nfts));
+    return Object.values(nfts);
+  }
+
+  const NFT_GetReceivedDates = async function (nftIDs: { [add_id:string]: {address:string, id:number, date:number}}): Promise<{ [add_id:string]: {address:string, id:number, date:number}}> {
+    const EthTokenTransfers = Moralis.Object.extend("EthNFTTransfers");
+    const query = new Moralis.Query(EthTokenTransfers);
+    query.equalTo("to_address", luftballonsAddress);
+    query.containedIn("token_address", Object.values(nftIDs).map(id => id.address));
+    query.containedIn("token_id", Object.values(nftIDs).map(id => id.id));
+    const found = await query.find();
+    for(let row of found) {
+      let address = await row.get("token_address");
+      let id = await row.get("token_id");
+      let add_id = address+id;
+      let date = Date.parse(await row.get("block_timestamp"));
+      if(nftIDs[add_id] && nftIDs[add_id].date < date) {
+        nftIDs[add_id].date = date
+      }
+    }
+    return nftIDs;
   }
 
   const NFT_GetLastSalePrice = async function (token_address:string, token_id:string) {
@@ -711,6 +728,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         price: (nft.last_sale ? nft.last_sale : ether/10**18)+"e",
         date: 0
       });
+      setUserLuftballons(results);
     }
 
     setUserLuftballons(results);
@@ -719,36 +737,55 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     return results;
   }
 
-  const txERC20_harvestAirdrops = async function (user_address:string, airdrop_token_addresses:string[], luftballons_ids:number[]) {
+  const txERC20_harvestAirdrops = async function (token_address:string) {
     const LuftballonsContract = getLuftballonsContract()
-    await LuftballonsContract
-        .harvestAirdrops(airdrop_token_addresses, luftballons_ids)
+    let receipt:ContractTransaction = await LuftballonsContract
+        .harvestAirdrops([token_address], userLuftballons.map(b => b.id))
+    await receipt.wait(1);
+    availableAirdrops[token_address].claimable = 0
+    setAvailableAirdrops(availableAirdrops)
   }
 
-  const txERC20_claimLuft = async function (user_address:string, luftballons_ids:string) {
+  const txERC20_claimLuft = async function () {
     const LuftballonsContract = getLuftballonsContract()
-    await LuftballonsContract
-        .claimLuft(luftballons_ids)
+    let receipt:ContractTransaction = await LuftballonsContract
+        .claimLuft(userLuftballons.map(b => b.id))
+    await receipt.wait(1);
+    await setClaimableLuft(0);
   }
 
   const txNFT_harvestERC1155Airdrop = async function (user_address:string, collection_address:string, token_id:number, quantity:number) {
-    return new Promise<void>(async(resolve, reject) => {
-      const LuftballonsContract = getLuftballonsContract()
-      await LuftballonsContract
-          .harvestERC1155Airdrop(collection_address, token_id, quantity)
-    })
+    const LuftballonsContract = getLuftballonsContract()
+    let receipt:ContractTransaction = await LuftballonsContract
+        .harvestERC1155Airdrop(collection_address, token_id, quantity)
+    await receipt.wait(1);
+    await setAvailableNFTs(availableNFTs.filter((element) => {return !(element.id == token_id && element.collection_metadata.address == collection_address)}))
   }
 
   const txNFT_harvestERC721Airdrop = async function (user_address:string, collection_address:string, token_id:number) {
     const LuftballonsContract = getLuftballonsContract()
-    await LuftballonsContract
+    let receipt:ContractTransaction = await LuftballonsContract
         .harvestERC721Airdrop(collection_address, token_id)
+    await receipt.wait(1);
+
+    await setAvailableNFTs(availableNFTs.filter((element) => {return !(element.id == token_id && element.collection_metadata.address == collection_address)}))
   }
 
-  const txERC20_noticeAirdrop = async function (user_address:string, token_address:string) {
+  const txERC20_noticeAirdrop = async function (token_address:string) {
     const LuftballonsContract = getLuftballonsContract()
-    await LuftballonsContract
+    let receipt:ContractTransaction = await LuftballonsContract
         .noticeAirdrop(token_address)
+    await receipt.wait(1);
+
+    availableAirdrops[token_address].claimable = 0
+    for(let balloon of userLuftballons.map(b => b.id)) {
+      let decimals = 10**+(availableAirdrops[token_address]?.metadata?.decimals ?? "18")
+      let available = +(await ERC20_claimableTokenQuantity(token_address,balloon)) / decimals
+      let current = (availableAirdrops[token_address].claimable ?? 0)
+      availableAirdrops[token_address].claimable = current+available
+      if(current+available > 0)
+        await setAvailableAirdrops(availableAirdrops);
+    }
   }
 
   const txERC20_approveForAirdropPull = async function (user_address:string, token_address:string, quantity:number, decimals:number) {

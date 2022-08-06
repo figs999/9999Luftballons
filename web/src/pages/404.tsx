@@ -17,7 +17,7 @@ const ErrorPage: NextPageWithLayout = () => {
     <>
       <NextSeo
         title="404 Error! No Result Found"
-        description="React Next Web3 NFT Crypto Dashboard Template"
+        description="9999 Luftballons"
       />
 
       <div className="flex max-w-full flex-col items-center justify-center text-center">

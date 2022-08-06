@@ -1,27 +1,15 @@
 import Image from '@/components/ui/image';
 import AnchorLink from '@/components/ui/links/anchor-link';
-import { useIsMounted } from '@/lib/hooks/use-is-mounted';
-import { useIsDarkMode } from '@/lib/hooks/use-is-dark-mode';
-import lightLogo from '@/assets/images/logo.svg';
-import darkLogo from '@/assets/images/logo-white.svg';
 
-const Logo: React.FC<React.SVGAttributes<{}>> = (props) => {
-  const isMounted = useIsMounted();
-  const { isDarkMode } = useIsDarkMode();
-
+const Logo = () => {
   return (
     <AnchorLink
       href="/"
-      className="flex w-28 outline-none sm:w-32 4xl:w-36"
-      {...props}
+      className="flex"
     >
-      <span className="relative flex overflow-hidden">
-        {isMounted && isDarkMode && (
-          <Image src={darkLogo} alt="Criptic" priority />
-        )}
-        {isMounted && !isDarkMode && (
-          <Image src={lightLogo} alt="Criptic" priority />
-        )}
+      <span className="relative items-center">
+        <Image src='https://lh3.googleusercontent.com/BhwoZ29AZz9g8GQf_bKPPd0quYatd-JuMNMCxp2deyyntdWyyCSyDaZ39yG2qbEimvZaM9GLW8d75xo5-YoqY7HDFKnQFAQ7g-ClyQ=w80' width='80' height='80' alt="9999 Luftballons" priority />
+        {'  9999 Luftballons'}
       </span>
     </AnchorLink>
   );

@@ -178,8 +178,8 @@ const TokensPage: NextPageWithLayout = () => {
   return (
     <>
       <NextSeo
-        title="Farms"
-        description="Criptic - React Next Web3 NFT Crypto Dashboard Template"
+        title="Explore Token Drops"
+        description="9999 Luftballons DApp Interface"
       />
       <div className="mx-auto w-full sm:pt-8">
         <div className="relative z-10 mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center md:gap-6">

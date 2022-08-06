@@ -20,7 +20,7 @@ import Scrollbar from '@/components/ui/scrollbar';
 import Button from '@/components/ui/button';
 import { Close } from '@/components/icons/close';
 import { NFTList } from '@/data/static/nft-list';
-import {nft, WalletContext, ServerSide_AvailableNFTs} from "@/lib/hooks/use-connect";
+import {nft, WalletContext} from "@/lib/hooks/use-connect";
 import Moralis from "moralis";
 
 const gridCompactViewAtom = atom(false);
@@ -71,10 +71,10 @@ function GridSwitcher() {
 }
 
 const sort = [
-  { id: 1, name: 'Date Listed: Newest', func: (a:nft,b:nft) => {return b?.date - a?.date} },
-  { id: 2, name: 'Date Listed: Oldest', func: (a:nft,b:nft) => {return a?.date - b?.date} },
-  { id: 3, name: 'LUFT$: Descending', func: (a:nft,b:nft) => {return (a.luft&&b.luft) ? (b.luft - a.luft) : 0} },
-  { id: 4, name: 'LUFT$: Ascending', func: (a:nft,b:nft) => {return (a.luft&&b.luft) ? (a.luft - b.luft) : 0} },
+  { id: 1, name: 'LUFT$: Ascending', func: (a:nft,b:nft) => {return (a.luft&&b.luft) ? (a.luft - b.luft) : 0} },
+  { id: 2, name: 'LUFT$: Descending', func: (a:nft,b:nft) => {return (a.luft&&b.luft) ? (b.luft - a.luft) : 0} },
+  { id: 3, name: 'Date Listed: Newest', func: (a:nft,b:nft) => {return b?.date - a?.date} },
+  { id: 4, name: 'Date Listed: Oldest', func: (a:nft,b:nft) => {return a?.date - b?.date} },
 ];
 
 const sortAtom = atom(sort[0]);
@@ -226,17 +226,15 @@ export function DrawerFilters() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
   return {
-    props: {
-      nfts: await ServerSide_AvailableNFTs()
-    }
+    props: { }
   }
 }
 
 const NFTPage: NextPageWithLayout<
-    InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({nfts}) => {
+    InferGetServerSidePropsType<typeof getStaticProps>
+> = () => {
   const { isGridCompact } = useGridSwitcher();
   const { sortMethod } = useSortSwitcher();
   const { openDrawer } = useDrawer();
@@ -244,19 +242,19 @@ const NFTPage: NextPageWithLayout<
 
   /* This effect will fetch wallet address if user has already connected his/her wallet */
   useEffect(() => {
-    async function checkLuftCosts() {
-      await NFT_AvailableNFTs(nfts);
+    async function getAvailableNFTs() {
+      await NFT_AvailableNFTs();
     }
 
-    if(address) checkLuftCosts();
+    if(address) getAvailableNFTs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);
 
   return (
     <>
       <NextSeo
-        title="Explore NTF"
-        description="Criptic - React Next Web3 NFT Crypto Dashboard Template"
+        title="Explore NTF Drops"
+        description="9999 Luftballons DApp Interface"
       />
       <div className="grid sm:pt-5 2xl:grid-cols-[280px_minmax(auto,_1fr)] 4xl:grid-cols-[320px_minmax(auto,_1fr)]">
         <div className="hidden border-dashed border-gray-200 ltr:border-r ltr:pr-8 rtl:border-l rtl:pl-8 dark:border-gray-700 2xl:block">
@@ -266,7 +264,7 @@ const NFTPage: NextPageWithLayout<
         <div className="2xl:ltr:pl-10 2xl:rtl:pr-10 4xl:ltr:pl-12 4xl:rtl:pr-12">
           <div className="relative z-10 mb-6 flex items-center justify-between">
             <span className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">
-              {nfts.length} items
+              {availableNFTs.length} items
             </span>
 
             <div className="flex gap-6 2xl:gap-8">

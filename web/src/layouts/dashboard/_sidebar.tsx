@@ -64,15 +64,15 @@ const menuItems = [
   {
     name: 'Send Luftdrops',
     icon: <VoteIcon />,
-    href: routes.vote,
+    href: "",
     dropdownItems: [
       {
         name: 'Manage MY NFT Project',
-        href: routes.vote,
+        href: routes.home,
       },
       {
         name: 'Manage ERC20 Luftdrop',
-        href: routes.vote,
+        href: routes.home,
       },
       {
         name: 'How to Send?',

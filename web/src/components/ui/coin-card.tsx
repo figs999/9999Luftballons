@@ -6,6 +6,7 @@ import { StaticImageData } from 'next/image';
 import TopupButton from "@/components/ui/topup-button";
 import {useContext} from "react";
 import {WalletContext} from "@/lib/hooks/use-connect";
+import Button from "@/components/ui/button";
 
 type CoinCardProps = {
   id: string;
@@ -30,7 +31,7 @@ export function CoinCard({
   text
 }: CoinCardProps) {
 
-  const { claimableLuft } = useContext(WalletContext);
+  const { claimableLuft, txERC20_claimLuft } = useContext(WalletContext);
 
   return (
     <div
@@ -56,7 +57,7 @@ export function CoinCard({
       {symbol == "LUFT" ? (
           <div>
             <div className="mt-2 flex items-center justify-between text-xs font-medium 2xl:text-sm">
-              <span className="tracking-wider text-gray-600">Harvestable: {claimableLuft.toFixed(3)}</span>
+              <span className="tracking-wider text-gray-600">Harvestable: {claimableLuft.toFixed(1)}</span>
             </div>
           </div>
       ):(
@@ -66,7 +67,17 @@ export function CoinCard({
       )}
       <br/>
       <div>
-        <TopupButton link={link} text={text} />
+        {symbol != "LUFT" ? (
+          <TopupButton link={link} text={text} />
+            ) : (
+          <Button
+              onClick={() => txERC20_claimLuft()}
+              className="shadow-main hover:shadow-large"
+              disabled={claimableLuft < 0.1}
+          >
+            HARVEST LUFT!
+          </Button>
+            )}
       </div>
     </div>
   );
