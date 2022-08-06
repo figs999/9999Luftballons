@@ -17,7 +17,8 @@ const routes = {
   profile: '/profile',
   portfolio: '/profile?view=portfolio',
   history: '/profile?view=history',
-  nftDrops: '/nft-drops'
+  nftDrops: '/nft-drops',
+  tokenDrops: '/token-drops',
 };
 
 export default routes;

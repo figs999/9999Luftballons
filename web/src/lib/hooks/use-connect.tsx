@@ -113,6 +113,14 @@ export type nft = {
   date: number;
 }
 
+export type tokenData = {
+    value:number,
+    price?: { nativePrice?: { value: string, decimals: number, name: string, symbol: string }, usdPrice: number, exchangeAddress?: string, exchangeName?: string },
+    metadata?: { address: string, name: string, symbol: string, decimals: string, logo?: string | undefined, logo_hash?: string | undefined, thumbnail?: string | undefined, block_number?: string | undefined, validated?: string | undefined },
+    claimable?: number,
+    noticed?: number
+}
+
 export function getChainData(chainId: number): IChainData | undefined {
   const chainData = supportedChains.filter(
       (chain: any) => chain.chain_id === chainId
@@ -183,6 +191,10 @@ export async function ServerSide_AvailableNFTs():Promise<nft[]> {
   }
 
   return Object.values(nfts)
+}
+
+export async function ServerSide_AvailableAirdrops():Promise<{[address:string]:tokenData}> {
+  return {}
 }
 
 export const WalletProvider = ({ children }: { children: ReactNode }) => {
@@ -264,7 +276,6 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   /* This effect will fetch wallet address if user has already connected his/her wallet */
   useEffect(() => {
     async function checkConnection() {
-      Moralis.Web3API.initialize({serverUrl:"https://sbiqhzhzxwjq.usemoralis.com:2053/server"});
       if ((web3Modal && web3Modal.cachedProvider)) {
         await connectToWallet();
       }
@@ -283,7 +294,6 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       if (signer) {
         const web3Address = await signer.getAddress();
         setAddress(web3Address);
-        await Moralis.User.logIn("a","a");
         console.log("Logged In Moralis");
         await getBalance(web3Address);
       }
@@ -410,14 +420,6 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     )
   }
 
-  type tokenData = {
-    [address: string]: {
-      value:number,
-      price?: { nativePrice?: { value: string, decimals: number, name: string, symbol: string }, usdPrice: number, exchangeAddress?: string, exchangeName?: string },
-      metadata?: { address: string, name: string, symbol: string, decimals: string, logo?: string | undefined, logo_hash?: string | undefined, thumbnail?: string | undefined, block_number?: string | undefined, validated?: string | undefined }
-    }
-  }
-
   type CoinCardProps = {
     id: string;
     name: string;
@@ -436,7 +438,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         .airdroppedQuantity(token_address)
   }
 
-  const ERC20_tokenMetadata = async function(tokens:tokenData): Promise<tokenData> {
+  const ERC20_tokenMetadata = async function(tokens:{[address:string]:tokenData}): Promise<{[address:string]:tokenData}> {
     let _addresses = Object.keys(tokens)
     const options = {
       addresses: _addresses,
@@ -472,26 +474,44 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     return tokens;
   }
 
-  const [availableAirdrops, setAvailableAirdrops] = useState<tokenData>({});
+  const [availableAirdrops, setAvailableAirdrops] = useState<{[address:string]:tokenData}>({});
   const ERC20_availableAirdrops = async function() {
-    let results:tokenData = {}
+    let results:{[address:string]:tokenData} = {}
 
     const EthTokenTransfers = Moralis.Object.extend("EthTokenTransfers");
     const query = new Moralis.Query(EthTokenTransfers);
-    query.equalTo("to_address", "0x356e1363897033759181727e4bff12396c51a7e0");
+    query.equalTo("to_address", luftballonsAddress);
     const found = await query.find();
-    for (let i = 0; i < found.length; i++) {
-      const row = found[i];
-      const tok = await row.get("token_address");
-      const val = await row.get("decimal");
-      if(results[tok])
-        results[tok].value += val.value
+
+    for(let row of found) {
+      const tok = await row?.get("token_address");
+      const val = await row?.get("value");
+      console.log("!!!!!!!!!!!!!!!!!!!!" + tok);
+      if (results[tok])
+        results[tok].value += Number.parseInt(val)
       else
-        results[tok].value = +val.value
+        results[tok] = {value: Number.parseInt(val)}
     }
 
     results = await ERC20_tokenMetadata(results);
     await setAvailableAirdrops(results);
+
+    for(let address of Object.keys(results)) {
+      let decimals = 10**( Number.parseInt(results[address]?.metadata?.decimals??"18"));
+      const erc20Contract = getERC20Contract(address);
+      results[address].value = +(await erc20Contract.balanceOf(luftballonsAddress)) / decimals
+      await setAvailableAirdrops(results);
+      results[address].noticed = +(await ERC20_airdroppedQuantity(address)) / decimals
+      await setAvailableAirdrops(results);
+
+      for(let balloon of userLuftballons) {
+        results[address].claimable = +(await ERC20_claimableTokenQuantity(address, balloon.id))/decimals +
+            +(results[address].claimable??0)
+        if(results[address].claimable??0 > 0)
+          await setAvailableAirdrops(results);
+      }
+    }
+
     return results;
   }
 
@@ -502,7 +522,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         "0x6e946833aa67eaf849927817f25f0d2f04064499", //NFTX_LUFT
         "0x46bffbcc49bab96345717a7b83edc75c82a814bf", //xLUFT
     ];
-    let results:tokenData = {}
+    let results:{[address:string]:tokenData} = {}
 
     for(let address of addresses) {
       const erc20Contract = getERC20Contract(address);
@@ -552,12 +572,9 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     addresses.push(luftballonsAddress)
     addresses = addresses.reverse();
 
-    console.log(`BLOOP!: ${addresses[3]}`);
-
     let cards:CoinCardProps[] = [];
     for(let contract of addresses) {
       let result = results[contract]
-      console.log(`Bloooop! ${contract}`)
       cards.push({
         id: contract,
         name: result.metadata?.name ?? "",

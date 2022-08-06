@@ -182,77 +182,9 @@ function PriceRange() {
   );
 }
 
-function Status() {
-  let [plan, setPlan] = useState('buy-now');
-  console.log(plan);
-  return (
-    <RadioGroup
-      value={plan}
-      onChange={setPlan}
-      className="grid grid-cols-2 gap-2 p-5"
-    >
-      <RadioGroup.Option value="buy-now">
-        {({ checked }) => (
-          <span
-            className={`flex h-9 cursor-pointer items-center justify-center rounded-lg border border-solid text-center text-sm font-medium uppercase tracking-wide transition-all ${
-              checked
-                ? 'border-brand bg-brand text-white shadow-button'
-                : 'border-gray-200 bg-white text-brand dark:border-gray-700 dark:bg-gray-800 dark:text-white'
-            }`}
-          >
-            Buy Now
-          </span>
-        )}
-      </RadioGroup.Option>
-      <RadioGroup.Option value="on-auction">
-        {({ checked }) => (
-          <span
-            className={`flex h-9 cursor-pointer items-center justify-center rounded-lg border border-solid text-center text-sm font-medium uppercase tracking-wide transition-all ${
-              checked
-                ? 'border-brand bg-brand text-white shadow-button'
-                : 'border-gray-200 bg-white text-brand dark:border-gray-700 dark:bg-gray-800 dark:text-white'
-            }`}
-          >
-            On Auction
-          </span>
-        )}
-      </RadioGroup.Option>
-      <RadioGroup.Option value="new">
-        {({ checked }) => (
-          <span
-            className={`flex h-9 cursor-pointer items-center justify-center rounded-lg border border-solid text-center text-sm font-medium uppercase tracking-wide transition-all ${
-              checked
-                ? 'border-brand bg-brand text-white shadow-button'
-                : 'border-gray-200 bg-white text-brand dark:border-gray-700 dark:bg-gray-800 dark:text-white'
-            }`}
-          >
-            New
-          </span>
-        )}
-      </RadioGroup.Option>
-      <RadioGroup.Option value="has-offers">
-        {({ checked }) => (
-          <span
-            className={`flex h-9 cursor-pointer items-center justify-center rounded-lg border border-solid text-center text-sm font-medium uppercase tracking-wide transition-all ${
-              checked
-                ? 'border-brand bg-brand text-white shadow-button'
-                : 'border-gray-200 bg-white text-brand dark:border-gray-700 dark:bg-gray-800 dark:text-white'
-            }`}
-          >
-            Has offers
-          </span>
-        )}
-      </RadioGroup.Option>
-    </RadioGroup>
-  );
-}
-
 function Filters() {
   return (
     <>
-      <Collapse label="Status" initialOpen>
-        <Status />
-      </Collapse>
       <Collapse label="Price Range" initialOpen>
         <PriceRange />
       </Collapse>

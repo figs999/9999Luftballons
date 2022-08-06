@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useContext, useEffect, useState} from 'react';
 import type { NextPageWithLayout } from '@/types';
 import { motion } from 'framer-motion';
 import cn from 'classnames';
@@ -14,6 +14,7 @@ import { SearchIcon } from '@/components/icons/search';
 import AirdropList from '@/components/farms/list';
 import ActiveLink from '@/components/ui/links/active-link';
 import { FarmsData } from '@/data/static/farms-data';
+import {tokenData, WalletContext} from "@/lib/hooks/use-connect";
 
 const sort = [
   { id: 1, name: 'Hot' },
@@ -74,7 +75,7 @@ function Search() {
       <label className="flex w-full items-center">
         <input
           className="h-11 w-full appearance-none rounded-lg border-2 border-gray-200 bg-transparent py-1 text-sm tracking-tighter text-gray-900 outline-none transition-all placeholder:text-gray-600 focus:border-gray-900 ltr:pr-5 ltr:pl-10 rtl:pr-10 dark:border-gray-600 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-gray-500"
-          placeholder="Search farms"
+          placeholder="Search Token Drops"
           autoComplete="off"
         />
         <span className="pointer-events-none absolute flex h-full w-8 cursor-pointer items-center justify-center text-gray-600 hover:text-gray-900 ltr:left-0 ltr:pl-2 rtl:right-0 rtl:pr-2 dark:text-gray-500 sm:ltr:pl-3 sm:rtl:pr-3">
@@ -137,7 +138,7 @@ function Status() {
                 layoutId="statusIndicator"
               />
             )}
-            <span className="relative">LIVE</span>
+            <span className="relative">SHOW ALL DROPS</span>
           </span>
         )}
       </RadioGroup.Option>
@@ -154,7 +155,7 @@ function Status() {
                 layoutId="statusIndicator"
               />
             )}
-            <span className="relative">FINISHED</span>
+            <span className="relative">HIDE MICRO DROPS</span>
           </span>
         )}
       </RadioGroup.Option>
@@ -162,7 +163,18 @@ function Status() {
   );
 }
 
-const FarmsPage: NextPageWithLayout = () => {
+const TokensPage: NextPageWithLayout = () => {
+  const { availableAirdrops, ERC20_availableAirdrops, address } = useContext(WalletContext);
+
+  useEffect(() => {
+    async function checkForAirdrops() {
+      await ERC20_availableAirdrops();
+    }
+
+    if(address) checkForAirdrops();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address]);
+
   return (
     <>
       <NextSeo
@@ -173,49 +185,37 @@ const FarmsPage: NextPageWithLayout = () => {
         <div className="relative z-10 mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center md:gap-6">
           <div className="flex items-center justify-between gap-4">
             <Status />
-            <div className="md:hidden">
-              <StackedSwitch />
-            </div>
           </div>
 
           <div className="flex items-center gap-4 lg:gap-8">
-            <div className="hidden shrink-0 md:block">
-              <StackedSwitch />
-            </div>
             <Search />
             <SortList />
           </div>
         </div>
 
-        <div className="mb-3 hidden grid-cols-3 gap-6 rounded-lg bg-white shadow-card dark:bg-light-dark sm:grid lg:grid-cols-5">
+        <div className="mb-3 hidden grid-cols-5 gap-6 rounded-lg bg-white shadow-card dark:bg-light-dark sm:grid lg:grid-cols-5">
           <span className="px-8 py-6 text-sm tracking-wider text-gray-500 dark:text-gray-300">
-            Pool
-          </span>
-          <span className="px-8 py-6 text-sm tracking-wider text-gray-500 dark:text-gray-300">
-            Earned
+            Token Name
           </span>
           <span className="px-8 py-6 text-sm tracking-wider text-gray-500 dark:text-gray-300">
-            APR
+            Airdrop/Balloon
           </span>
-          <span className="hidden px-8 py-6 text-sm tracking-wider text-gray-500 dark:text-gray-300 lg:block">
-            Liquidity
+          <span className="px-8 py-6 text-sm tracking-wider text-gray-500 dark:text-gray-300">
+            USD/Balloon
           </span>
-          <span className="hidden px-8 py-6 text-sm tracking-wider text-gray-500 dark:text-gray-300 lg:block">
-            Multiplier
+          <span className="px-8 py-6 text-sm tracking-wider text-gray-500 dark:text-gray-300">
+            Fully Noticed
+          </span>
+          <span className="px-8 py-6 text-sm tracking-wider text-gray-500 dark:text-gray-300">
+            Your Claim
           </span>
         </div>
 
-        {FarmsData.map((farm) => {
+        {Object.values<tokenData>(availableAirdrops).map((_tokenData:tokenData) => {
           return (
             <AirdropList
-              key={farm.id}
-              from={farm.from}
-              to={farm.to}
-              earned={farm.earned}
-              apr={farm.apr}
-              liquidity={farm.liquidity}
-              multiplier={farm.multiplier}
-            >
+                key = {_tokenData.metadata?.address}
+                airdrop = {_tokenData}>
               <div className="mb-4 grid grid-cols-2 gap-4 sm:mb-6 sm:gap-6">
                 <input
                   type="number"
@@ -228,11 +228,6 @@ const FarmsPage: NextPageWithLayout = () => {
                   className="spin-button-hidden h-11 appearance-none rounded-lg border-solid border-gray-200 bg-body px-4 text-sm tracking-tighter text-gray-900 placeholder:text-gray-600 focus:border-gray-900 focus:shadow-none focus:outline-none focus:ring-0 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-gray-600 sm:h-13"
                 />
               </div>
-              <ActiveLink href="/farms-2">
-                <Button shape="rounded" fullWidth size="large">
-                  APPROVE
-                </Button>
-              </ActiveLink>
             </AirdropList>
           );
         })}
@@ -241,8 +236,8 @@ const FarmsPage: NextPageWithLayout = () => {
   );
 };
 
-FarmsPage.getLayout = function getLayout(page) {
+TokensPage.getLayout = function getLayout(page) {
   return <DashboardLayout>{page}</DashboardLayout>;
 };
 
-export default FarmsPage;
+export default TokensPage;

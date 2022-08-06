@@ -5,36 +5,20 @@ import { Bnb } from '@/components/icons/bnb';
 import { Usdc } from '@/components/icons/usdc';
 import { Cardano } from '@/components/icons/cardano';
 import { Doge } from '@/components/icons/doge';
+import {tokenData} from "@/lib/hooks/use-connect";
 
 export type CoinList = 'BTC' | 'ETH' | 'USDT' | 'BNB' | 'USDC' | 'ADA' | 'DOGE';
 
-const coinIcons: Record<CoinList, JSX.Element> = {
-  BTC: <Bitcoin />,
-  ETH: <Ethereum />,
-  USDT: <Tether />,
-  BNB: <Bnb />,
-  USDC: <Usdc />,
-  ADA: <Cardano />,
-  DOGE: <Doge />,
-};
-
-interface CurrencySwapIconsProps {
-  from: CoinList;
-  to: CoinList;
-}
-
-export default function CurrencySwapIcons({
-  from,
-  to,
-}: CurrencySwapIconsProps) {
+export default function CurrencyIcons({
+  metadata
+}: tokenData) {
   return (
     <div className="flex items-center">
       <div className="flex items-center">
-        <div className="relative">{coinIcons[from]}</div>
-        <div className="ltr:-ml-1.5 rtl:-mr-1.5">{coinIcons[to]}</div>
+        <div className="relative">{metadata?.thumbnail}</div>
       </div>
       <div className="whitespace-nowrap text-sm font-medium uppercase text-black ltr:ml-3 rtl:mr-3 dark:text-white">
-        {from}-{to}
+          <a href={`https://etherscan.io/token/${metadata?.address}`} target='_blank' rel="noreferrer">{metadata?.name}</a>
       </div>
     </div>
   );

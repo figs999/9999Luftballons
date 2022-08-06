@@ -58,11 +58,11 @@ export async function ERC20_availableAirdrops() {
         for (let i = 0; i < found.length; i++) {
             const row = found[i];
             const tok = await row.get("token_address");
-            const val = await row.get("decimal");
+            const val = await row.get("value");
             if(results[tok])
-                results[tok].value += val.value
+                results[tok].value += +val.value
             else
-                results[tok] = {value: val.value}
+                results[tok] = {value: +val.value}
         }
 
         let _addresses = Object.keys(results)
@@ -74,7 +74,7 @@ export async function ERC20_availableAirdrops() {
 
         for(let i = 0; i < tokenMetadata.length; i++) {
             const metadata = tokenMetadata[i]
-            results[metadata.address].value /= 10**metadata.decimals
+            results[metadata.address].value /= 10**+metadata.decimals
             results[metadata.address].metadata = metadata
 
             const options = {

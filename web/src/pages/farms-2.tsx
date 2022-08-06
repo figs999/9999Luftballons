@@ -11,7 +11,7 @@ import Button from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { ChevronDown } from '@/components/icons/chevron-down';
 import { SearchIcon } from '@/components/icons/search';
-import FarmList from '@/components/farms/list';
+import AirdropList from '@/components/farms/list';
 import { FarmsData } from '@/data/static/farms-data';
 
 const sort = [
@@ -206,7 +206,7 @@ const FarmsPage: NextPageWithLayout = () => {
 
         {FarmsData.map((farm) => {
           return (
-            <FarmList
+            <AirdropList
               key={farm.id}
               from={farm.from}
               to={farm.to}
@@ -255,7 +255,7 @@ const FarmsPage: NextPageWithLayout = () => {
               <Button shape="rounded" fullWidth size="large">
                 HARVEST
               </Button>
-            </FarmList>
+            </AirdropList>
           );
         })}
       </div>

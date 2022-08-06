@@ -54,7 +54,7 @@ const menuItems = [
   {
     name: 'ERC20 Luftdrops',
     icon: <PlusCircle />,
-    href: routes.farms,
+    href: routes.tokenDrops,
   },
   {
     name: 'Guide',
