@@ -1,7 +1,18 @@
 const runtimeCaching = require('next-pwa/cache');
+const withPWA = require("next-pwa");
 
-/*module.exports = withPWA({
+module.exports = withPWA({
   reactStrictMode: true,
+  images: {
+    domains: [
+      'lh3.googleusercontent.com',
+      '*.googleusercontent.com',
+      'googleusercontent.com:*',
+      '*.googleusercontent.com:*',
+      'openseauserdata.com:*',
+      'openseauserdata.com'
+    ]
+  },
   pwa: {
     dest: 'public',
     disable: process.env.NODE_ENV === 'development',
@@ -15,8 +26,9 @@ const runtimeCaching = require('next-pwa/cache');
       ignoreDuringBuilds: true,
     },
   }),
-});*/
+});
 
+/*
 module.exports = {
   reactStrictMode: true,
   images: {
@@ -30,3 +42,4 @@ module.exports = {
     ]
   }
 }
+*/
