@@ -67,7 +67,7 @@ export default function NFTGrid({
             <Button
                 onClick={() => claimNFT(collection_metadata.address, id)}
                 className="shadow-main hover:shadow-large"
-                disabled={userBalances[0] && userBalances[0].balance<luft}
+                disabled={userBalances[1] && userBalances[1].balance<luft}
             >
               Claim It!
             </Button>
