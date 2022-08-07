@@ -265,8 +265,8 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     const balanceInEth = ethers.utils.formatEther(walletBalance);
     console.log(walletBalance);
     setBalance(balanceInEth.toString());
-    await ERC20_userBalances(walletAddress);
-    await NFT_UserLuftballons(walletAddress);
+    NFT_UserLuftballons(walletAddress);
+    ERC20_userBalances(walletAddress);
   };
 
   const disconnectWallet = () => {
