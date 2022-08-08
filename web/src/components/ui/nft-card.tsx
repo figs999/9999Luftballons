@@ -16,9 +16,10 @@ export default function NFTGrid({
     luft,
     thumbnail_url,
     collection_metadata,
-    date
+    date,
+    ensState
 }: nft) {
-    const { txNFT_harvestERC721Airdrop, txNFT_harvestERC1155Airdrop, address, userBalances } = useContext(WalletContext);
+    const { txNFT_harvestERC721Airdrop, txNFT_harvestERC1155Airdrop, txNFT_SetPrimaryENS, txRegisterENS, address, userBalances } = useContext(WalletContext);
     let claimNFT = async function(collection:string, token:number) {
         if(collection_metadata.schema_name == "ERC721") {
             await txNFT_harvestERC721Airdrop(address,collection,token);
@@ -76,6 +77,28 @@ export default function NFTGrid({
         {date ? (
           <div className="mt-4 text-sm font-medium text-gray-900 dark:text-white">
               Dropped: {(new Date(date)).toLocaleString('en-US')}
+          </div>
+        ):(<div/>)}
+        {ensState != undefined ? (
+          <div className="mt-4 text-lg font-large text-gray-900 dark:text-white rounded-lg"
+               
+          >
+              {id}.THELUFTBALLONS.ETH DOMAIN:
+              <br />
+              <div className="text-right">
+                  <Button
+                      onClick={async () => {
+                          if(ensState == 0)
+                              await txRegisterENS(id);
+                          else if(ensState == 1)
+                              await txNFT_SetPrimaryENS(id);
+                      }}
+                      color={ensState < 1 ? "success":"warning"}
+                      className="shadow-main hover:shadow-large"
+                      disabled={ensState>1}>
+                      {ensState == 0 ? `CLAIM ENS DOMAIN!` : ensState == 1 ? `SET AS PRIMARY ENS!` : `PRIMARY ENS`}
+                  </Button>
+              </div>
           </div>
         ):(<div/>)}
       </div>

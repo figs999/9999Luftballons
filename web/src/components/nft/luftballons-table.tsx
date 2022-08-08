@@ -156,6 +156,7 @@ export default function TransactionTable() {
                   name={NFT.name}
                   collection_metadata={NFT.collection_metadata}
                   date={NFT.date}
+                  ensState={NFT.ensState}
               />
           ))}
         </div>

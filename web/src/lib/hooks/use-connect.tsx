@@ -15,6 +15,9 @@ import {components, operations} from "moralis/types/generated/web3Api";
 import { AbiItem } from 'web3-utils';
 import erc20ContractABI from '../erc20.abi.json';
 import LuftballonsContractABI from '../luftballons.abi.json';
+import LuftRegistarABI from '../luftregistrar.abi.json';
+import ENSReverseRegistrarABI from '../ensreverseregistrar.abi.json';
+
 import Moralis from "moralis";
 
 import LuftballonsImage from '@/assets/images/coin/balloon.svg';
@@ -29,6 +32,7 @@ import {Runtime} from "inspector";
 import {ContractTransaction} from "@ethersproject/contracts/src.ts";
 
 const luftballonsAddress = '0x356e1363897033759181727e4bff12396c51a7e0';
+const luftRegistrarAddress = '0x2F1Fe020617a0898d44951625677CD4C040a3dB1';
 
 const supportedChains: IChainData[] = [
   {
@@ -112,6 +116,7 @@ export type nft = {
   metadata?: any;
   collection_metadata?: any;
   date: number;
+  ensState?: number;
 }
 
 export type tokenData = {
@@ -376,6 +381,22 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     )
   }
 
+  const getLuftRegistrarContract = function () {
+    return new Contract(
+        luftRegistrarAddress,
+        LuftRegistarABI,
+        provider?.getSigner()
+    )
+  }
+
+  const getENSReverseRegistrarContract = function() {
+    return new Contract(
+        "0x084b1c3C81545d370f3634392De611CaaBFf8148",
+        ENSReverseRegistrarABI,
+        provider?.getSigner()
+    )
+  }
+
   type CoinCardProps = {
     id: string;
     name: string;
@@ -602,6 +623,18 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     return result /10**18
   }
 
+  const NFT_LuftballonENSClaimed = async function (luftballons:nft[]):Promise<void> {
+    const LuftRegistrarContract = getLuftRegistrarContract()
+    let results:number[] = await LuftRegistrarContract
+        .isRegistered(luftballons.map(b => b.id))
+
+    for(let i = 0; i < luftballons.length; i++) {
+      luftballons[i].ensState = Number(results[i]);
+    }
+
+    await setUserLuftballons(luftballons);
+  }
+
   const [availableNFTs, setAvailableNFTs] = useState<nft[]>([]);
   const NFT_AvailableNFTs = async function():Promise<nft[]> {
 
@@ -733,7 +766,8 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
     setUserLuftballons(results);
 
-    await ERC20_claimableLuft(ids);
+    NFT_LuftballonENSClaimed(results);
+    ERC20_claimableLuft(ids);
     return results;
   }
 
@@ -806,6 +840,21 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         .setCustomNFTPrice(collection_address, burn_price*(10**18))
   }
 
+  const txRegisterENS = async function (balloonID:number) {
+    const LuftRegistrarContract = getLuftRegistrarContract()
+    let tx = await LuftRegistrarContract
+        .register(balloonID);
+    let receipt = await tx.wait();
+  }
+
+  const txNFT_SetPrimaryENS = async function (luftballonsID:number):Promise<void> {
+    const RegistrarContract = getENSReverseRegistrarContract()
+    let tx = await RegistrarContract
+        .setName(`${luftballonsID}.theluftballons.eth`);
+    let receipt = tx.wait();
+    await NFT_LuftballonENSClaimed(userLuftballons);
+  }
+
   return (
       <MoralisProvider serverUrl="https://sbiqhzhzxwjq.usemoralis.com:2053/server" appId="DzMrmJs7bp1l39yLtVOPFDrOPo2lKjOT9iosgS9X">
         <WalletContext.Provider
@@ -838,7 +887,9 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
             txERC20_noticeAirdrop,
             txERC20_approveForAirdropPull,
             txERC20_pullAirdrop,
-            txNFT_setCustomNFTPrice
+            txNFT_setCustomNFTPrice,
+            txNFT_SetPrimaryENS,
+            txRegisterENS
           }}
         >
           {children}
