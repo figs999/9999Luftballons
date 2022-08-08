@@ -658,7 +658,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         metadata: nft.traits,
         collection_metadata: nft.asset_contract,
         price: nft.last_sale ? (
-            (nft.last_sale.total_price * nft.last_sale.payment_token.eth_price) / 10 ** nft.last_sale.payment_token.decimals
+            (+(nft.last_sale.total_price) * +(nft.last_sale.payment_token.eth_price)) / 10 ** +(nft.last_sale.payment_token.decimals)
         ) + "e" : "Unknown",
         //luft: await NFT_LuftPerNFT(nft.asset_contract.address),
         date: 0

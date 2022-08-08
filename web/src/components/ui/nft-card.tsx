@@ -55,37 +55,31 @@ export default function NFTGrid({
         </AnchorLink>
         <AnchorLink
           href={nft_url} target="_blank"
-          className="text-sm font-medium text-black dark:text-white"
+          className="text-xs font-light text-black dark:text-white"
         >
           {collection}
         </AnchorLink>
-        <div className="mt-4 text-sm font-medium text-gray-900 dark:text-white">
-          Last Sale: {price}
-        </div>
         {luft ? (
-          <div className="mt-4 text-sm font-medium text-gray-900 dark:text-white">
-            Burn Fee: {luft} $LUFT
+            <div className="mt-8">Claim:
+          <div className="mt-2 text-sm font-medium text-gray-900 dark:text-white text-center">
             <Button
                 onClick={() => claimNFT(collection_metadata.address, id)}
                 className="shadow-main hover:shadow-large"
                 disabled={userBalances[1] && userBalances[1].balance<luft}
+                color="success"
             >
-              Claim It!
+              Burn {luft} $LUFT
             </Button>
           </div>
-        ):(<div/>)}
-        {date ? (
-          <div className="mt-4 text-sm font-medium text-gray-900 dark:text-white">
-              Dropped: {(new Date(date)).toLocaleString('en-US')}
-          </div>
+            </div>
         ):(<div/>)}
         {ensState != undefined ? (
-          <div className="mt-4 text-lg font-large text-gray-900 dark:text-white rounded-lg"
-               
+          <div className="mt-3 p-2 text-center text-lg font-black text-gray-900 dark:text-white rounded-lg"
+               style={{ backgroundColor: "#d8f7bb" }}
           >
-              {id}.THELUFTBALLONS.ETH DOMAIN:
+              {id}.THELUFTBALLONS.ETH DOMAIN
               <br />
-              <div className="text-right">
+              <div className="mt-2 bottom-8 text-center">
                   <Button
                       onClick={async () => {
                           if(ensState == 0)
@@ -99,6 +93,14 @@ export default function NFTGrid({
                       {ensState == 0 ? `CLAIM ENS DOMAIN!` : ensState == 1 ? `SET AS PRIMARY ENS!` : `PRIMARY ENS`}
                   </Button>
               </div>
+          </div>
+        ):(<div/>)}
+        <div className="mt-10 text-sm font-medium text-gray-900 dark:text-white">
+          Last Sale: {price?.toString()}
+        </div>
+        {date ? (
+          <div className="mt-2 text-xs font-extralight text-gray-900 dark:text-white">
+              Dropped: {(new Date(date)).toLocaleString('en-US')}
           </div>
         ):(<div/>)}
       </div>
