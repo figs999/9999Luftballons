@@ -127,12 +127,23 @@ function SortList() {
   );
 }
 
+const rangeAtom = atom({ min: 0, max: 1000, most: 1000 });
+function useFilterRange() {
+  const [range, setRange] = useAtom(rangeAtom);
+  return {
+    range,
+    setRange,
+  };
+}
+
 function PriceRange() {
-  let [range, setRange] = useState({ min: 0, max: 1000 });
+  let {range, setRange} = useFilterRange();
+
   function handleRangeChange(value: any) {
     setRange({
       min: value[0],
       max: value[1],
+      most: range.most
     });
   }
 
@@ -173,7 +184,7 @@ function PriceRange() {
       <Slider
         range
         min={0}
-        max={1000}
+        max={range.most}
         value={[range.min, range.max]}
         allowCross={false}
         onChange={(value) => handleRangeChange(value)}
@@ -182,14 +193,25 @@ function PriceRange() {
   );
 }
 
+const collectionAtom = atom<string|undefined>(undefined);
+function useCollectionFilter() {
+  const [collection, setCollection] = useAtom(collectionAtom);
+  return {
+    collection,
+    setCollection,
+  };
+}
+
 function Filters() {
+  const {collection, setCollection} = useCollectionFilter();
+
   return (
     <>
       <Collapse label="Price Range" initialOpen>
         <PriceRange />
       </Collapse>
       <Collapse label="Collection" initialOpen>
-        <CollectionSelect onSelect={(value) => console.log(value)} />
+        <CollectionSelect onSelect={(value) => setCollection(value)} />
       </Collapse>
     </>
   );
@@ -239,11 +261,17 @@ const NFTPage: NextPageWithLayout<
   const { sortMethod } = useSortSwitcher();
   const { openDrawer } = useDrawer();
   const { availableNFTs, NFT_AvailableNFTs, address } = useContext(WalletContext);
+  let {range, setRange} = useFilterRange();
+  const {collection, setCollection} = useCollectionFilter();
 
   /* This effect will fetch wallet address if user has already connected his/her wallet */
   useEffect(() => {
     async function getAvailableNFTs() {
-      await NFT_AvailableNFTs();
+      let available = await NFT_AvailableNFTs();
+      setRange({
+        min: 0,
+        max: available.sort(sort[1].func)[0].luft,
+        most: available.sort(sort[1].func)[0].luft})
     }
 
     if(address) getAvailableNFTs();
@@ -292,7 +320,7 @@ const NFTPage: NextPageWithLayout<
                 : 'grid gap-6 sm:grid-cols-2 md:grid-cols-3 3xl:grid-cols-3 4xl:grid-cols-4'
             }
           >
-            {availableNFTs.sort(sortMethod.func).map((_nft:nft) => (
+            {availableNFTs.filter((element:nft) => {return (collection == undefined || collection.toLowerCase() == (element.collection?.toLowerCase()??"")) && (element.luft??0) <= range.max && (element.luft??0) >= range.min}).sort(sortMethod.func).map((_nft:nft) => (
               <NFTGrid
                 key={_nft.collection_metadata.address + _nft.id}
                 id={_nft.id}

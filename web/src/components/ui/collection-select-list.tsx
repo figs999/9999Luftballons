@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useContext, useState} from 'react';
 import { StaticImageData } from 'next/image';
 import { SearchIcon } from '@/components/icons/search';
 import Avatar from '@/components/ui/avatar';
@@ -6,6 +6,7 @@ import CollectionImage1 from '@/assets/images/collection/collection-1.jpg';
 import CollectionImage2 from '@/assets/images/collection/collection-2.jpg';
 import CollectionImage3 from '@/assets/images/collection/collection-3.jpg';
 import CollectionImage4 from '@/assets/images/collection/collection-4.jpg';
+import {nft, WalletContext} from "@/lib/hooks/use-connect";
 
 export const collectionList = [
   {
@@ -41,19 +42,26 @@ interface CollectionSelectTypes {
 
 export default function CollectionSelect({ onSelect }: CollectionSelectTypes) {
   let [searchKeyword, setSearchKeyword] = useState('');
-  let coinListData = collectionList;
-  if (searchKeyword.length > 0) {
-    coinListData = collectionList.filter(function (item) {
-      const name = item.name;
-      return (
-        name.match(searchKeyword) ||
-        (name.toLowerCase().match(searchKeyword) && name)
-      );
-    });
+  const { availableNFTs } = useContext(WalletContext);
+
+  let coinListData:string[] = (availableNFTs?.map((item:nft) => item.collection)
+      .filter((value: any, index: any, self: string | any[]) => self.indexOf(value) === index)) ?? [];
+
+  if(coinListData.length > 0) {
+    if (searchKeyword.length > 0) {
+      coinListData = coinListData.filter(function (collection) {
+        return (
+            collection.match(searchKeyword) ||
+            (collection.toLowerCase().match(searchKeyword) && collection)
+        );
+      });
+    }
   }
+
   function handleSelectedCoin(value: string) {
     onSelect(value);
   }
+
   return (
     <div className="w-full rounded-lg bg-white text-sm shadow-large dark:bg-light-dark">
       <div className="relative">
@@ -67,18 +75,17 @@ export default function CollectionSelect({ onSelect }: CollectionSelectTypes) {
         />
       </div>
       <ul role="listbox" className="py-3">
-        {coinListData.length > 0 ? (
-          coinListData.map((item, index) => (
+        { coinListData ? (
+            coinListData.map(collection => (
             <li
-              key={index}
+              key={collection}
               role="listitem"
-              tabIndex={index}
-              onClick={() => handleSelectedCoin(item.value)}
+              tabIndex={availableNFTs.map((item:nft) => item.collection).indexOf(collection)}
+              onClick={() => handleSelectedCoin(collection)}
               className="mb-1 flex cursor-pointer items-center gap-3 py-1.5 px-6 outline-none hover:bg-gray-100 focus:bg-gray-200 dark:hover:bg-gray-700 dark:focus:bg-gray-600"
             >
-              <Avatar image={item.icon} size="xs" alt={item.name} />
               <span className="text-sm tracking-tight text-gray-600 dark:text-white">
-                {item.name}
+                {collection}
               </span>
             </li>
           ))
