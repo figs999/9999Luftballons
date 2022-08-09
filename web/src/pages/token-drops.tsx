@@ -1,5 +1,6 @@
-import {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import type { NextPageWithLayout } from '@/types';
+import { useDebounce } from 'use-debounce';
 import { motion } from 'framer-motion';
 import cn from 'classnames';
 import { NextSeo } from 'next-seo';
@@ -14,7 +15,7 @@ import { SearchIcon } from '@/components/icons/search';
 import AirdropList from '@/components/farms/list';
 import ActiveLink from '@/components/ui/links/active-link';
 import { FarmsData } from '@/data/static/farms-data';
-import {tokenData, WalletContext} from "@/lib/hooks/use-connect";
+import { tokenData, WalletContext } from '@/lib/hooks/use-connect';
 
 const sort = [
   { id: 1, name: 'Hot' },
@@ -65,7 +66,12 @@ function SortList() {
   );
 }
 
-function Search() {
+interface ISearchProps {
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  value: string;
+}
+
+function Search({ onChange, value }: ISearchProps) {
   return (
     <form
       className="relative flex w-full rounded-full md:w-auto lg:w-64 xl:w-80"
@@ -77,6 +83,8 @@ function Search() {
           className="h-11 w-full appearance-none rounded-lg border-2 border-gray-200 bg-transparent py-1 text-sm tracking-tighter text-gray-900 outline-none transition-all placeholder:text-gray-600 focus:border-gray-900 ltr:pr-5 ltr:pl-10 rtl:pr-10 dark:border-gray-600 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-gray-500"
           placeholder="Search Token Drops"
           autoComplete="off"
+          value={value}
+          onChange={onChange}
         />
         <span className="pointer-events-none absolute flex h-full w-8 cursor-pointer items-center justify-center text-gray-600 hover:text-gray-900 ltr:left-0 ltr:pl-2 rtl:right-0 rtl:pr-2 dark:text-gray-500 sm:ltr:pl-3 sm:rtl:pr-3">
           <SearchIcon className="h-4 w-4" />
@@ -164,16 +172,40 @@ function Status() {
 }
 
 const TokensPage: NextPageWithLayout = () => {
-  const { availableAirdrops, ERC20_availableAirdrops, address } = useContext(WalletContext);
+  let [searchKeyword, setSearchKeyword] = useState('');
+  const [searchKeywordDebounced] = useDebounce(searchKeyword, 600);
+  const { availableAirdrops, ERC20_availableAirdrops, address } =
+    useContext(WalletContext);
 
   useEffect(() => {
     async function checkForAirdrops() {
       await ERC20_availableAirdrops();
     }
 
-    if(address) checkForAirdrops();
+    if (address) checkForAirdrops();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);
+
+  const filteredAirdrops = useMemo(
+    () =>
+      Object.keys(availableAirdrops).reduce((acc, currentKey) => {
+        if (
+          availableAirdrops[currentKey].metadata.name
+            .toLowerCase()
+            .includes(searchKeywordDebounced.toLowerCase()) ||
+          availableAirdrops[currentKey].metadata.symbol
+            .toLowerCase()
+            .includes(searchKeywordDebounced.toLowerCase())
+        ) {
+          return {
+            ...acc,
+            [currentKey]: availableAirdrops[currentKey],
+          };
+        }
+        return acc;
+      }, {}),
+    [availableAirdrops, searchKeywordDebounced]
+  );
 
   return (
     <>
@@ -188,11 +220,13 @@ const TokensPage: NextPageWithLayout = () => {
           </div>
 
           <div className="flex items-center gap-4 lg:gap-8">
-            <Search />
+            <Search
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              value={searchKeyword}
+            />
             <SortList />
           </div>
         </div>
-
         <div className="mb-3 hidden grid-cols-5 gap-6 rounded-lg bg-white shadow-card dark:bg-light-dark sm:grid lg:grid-cols-5">
           <span className="px-8 py-6 text-sm tracking-wider text-gray-500 dark:text-gray-300">
             Token Name
@@ -210,27 +244,29 @@ const TokensPage: NextPageWithLayout = () => {
             Your Claim
           </span>
         </div>
-
-        {Object.values<tokenData>(availableAirdrops).map((_tokenData:tokenData) => {
-          return (
-            <AirdropList
-                key = {_tokenData.metadata?.address}
-                airdrop = {_tokenData}>
-              <div className="mb-4 grid grid-cols-2 gap-4 sm:mb-6 sm:gap-6">
-                <input
-                  type="number"
-                  placeholder="0.0"
-                  className="spin-button-hidden h-11 appearance-none rounded-lg border-solid border-gray-200 bg-body px-4 text-sm tracking-tighter text-gray-900 placeholder:text-gray-600 focus:border-gray-900 focus:shadow-none focus:outline-none focus:ring-0 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-gray-600 sm:h-13"
-                />
-                <input
-                  type="number"
-                  placeholder="0.0"
-                  className="spin-button-hidden h-11 appearance-none rounded-lg border-solid border-gray-200 bg-body px-4 text-sm tracking-tighter text-gray-900 placeholder:text-gray-600 focus:border-gray-900 focus:shadow-none focus:outline-none focus:ring-0 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-gray-600 sm:h-13"
-                />
-              </div>
-            </AirdropList>
-          );
-        })}
+        {Object.values<tokenData>(filteredAirdrops).map(
+          (_tokenData: tokenData) => {
+            return (
+              <AirdropList
+                key={_tokenData.metadata?.address}
+                airdrop={_tokenData}
+              >
+                <div className="mb-4 grid grid-cols-2 gap-4 sm:mb-6 sm:gap-6">
+                  <input
+                    type="number"
+                    placeholder="0.0"
+                    className="spin-button-hidden h-11 appearance-none rounded-lg border-solid border-gray-200 bg-body px-4 text-sm tracking-tighter text-gray-900 placeholder:text-gray-600 focus:border-gray-900 focus:shadow-none focus:outline-none focus:ring-0 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-gray-600 sm:h-13"
+                  />
+                  <input
+                    type="number"
+                    placeholder="0.0"
+                    className="spin-button-hidden h-11 appearance-none rounded-lg border-solid border-gray-200 bg-body px-4 text-sm tracking-tighter text-gray-900 placeholder:text-gray-600 focus:border-gray-900 focus:shadow-none focus:outline-none focus:ring-0 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-gray-600 sm:h-13"
+                  />
+                </div>
+              </AirdropList>
+            );
+          }
+        )}
       </div>
     </>
   );
