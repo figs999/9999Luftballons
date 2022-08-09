@@ -260,7 +260,7 @@ const NFTPage: NextPageWithLayout<
   const { isGridCompact } = useGridSwitcher();
   const { sortMethod } = useSortSwitcher();
   const { openDrawer } = useDrawer();
-  const { availableNFTs, NFT_AvailableNFTs, address } = useContext(WalletContext);
+  const { availableNFTs, NFT_AvailableNFTs, address} = useContext(WalletContext);
   let {range, setRange} = useFilterRange();
   const {collection, setCollection} = useCollectionFilter();
 
