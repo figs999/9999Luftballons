@@ -34,15 +34,15 @@ const menuItems = [
     dropdownItems: [
       {
         name: 'Discord',
-        href: "https://discord.gg/9999Luftballons",
+        href: 'https://discord.gg/9999Luftballons',
       },
       {
         name: '@9999Luftballons',
-        href: "https://twitter.com/9999Luftballons",
+        href: 'https://twitter.com/9999Luftballons',
       },
       {
         name: '@LuftBot',
-        href: "https://twitter.com/LuftBot",
+        href: 'https://twitter.com/LuftBot',
       },
     ],
   },
@@ -59,24 +59,24 @@ const menuItems = [
   {
     name: 'Guide',
     icon: <DiskIcon />,
-    href: "https://guide.9999luftballons.io/",
+    href: 'https://guide.9999luftballons.io/',
   },
   {
     name: 'Send Luftdrops',
     icon: <VoteIcon />,
-    href: "",
+    href: '',
     dropdownItems: [
       {
         name: 'Manage MY NFT Project (COMING SOON)',
-        href: "",
+        modal: 'MANAGE_NFT',
       },
       {
         name: 'Manage ERC20 Luftdrop (COMING SOON)',
-        href: "",
+        modal: 'MANAGE_ERC20',
       },
       {
         name: 'How to Send?',
-        href: "https://guide.9999luftballons.io/how-tos/airdrop-erc-20",
+        href: 'https://guide.9999luftballons.io/how-tos/airdrop-erc-20',
       },
     ],
   },
@@ -113,7 +113,7 @@ export default function Sidebar({ className }: SidebarProps) {
 
       <Scrollbar style={{ height: 'calc(100% - 96px)' }}>
         <div className="px-6 pb-5 2xl:px-8">
-           <div className="mt-12">
+          <div className="mt-12">
             {menuItems.map((item, index) => (
               <MenuItem
                 key={index}

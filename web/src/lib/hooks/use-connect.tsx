@@ -11,7 +11,7 @@ import CoinbaseWalletSDK from "@coinbase/wallet-sdk";
 import { Web3Auth } from "@web3auth/web3auth";
 import {MoralisProvider, useMoralis } from "react-moralis";
 import axios from "axios";
-import {components, operations} from "moralis/types/generated/web3Api";
+import {components, defaultResponse, operations} from "moralis/types/generated/web3Api";
 import { AbiItem } from 'web3-utils';
 import erc20ContractABI from '../erc20.abi.json';
 import LuftballonsContractABI from '../luftballons.abi.json';
@@ -162,7 +162,7 @@ export async function ServerSide_AvailableAirdrops():Promise<{[address:string]:t
 export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const [address, setAddress] = useState<string | undefined>(undefined);
   const [balance, setBalance] = useState<string | undefined>(undefined);
-  let [loading, setLoading] = useState<boolean>(false);
+  let   [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [chainId, setChainId] = useState<number>(1);
   const [networkId, setNetworkID] = useState<number>(1);
@@ -370,7 +370,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     return new Contract(
         address,
         erc20ContractABI,
-        provider
+        provider?.getSigner()
     )
   }
 
@@ -582,6 +582,19 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
     setUserBalances(cards);
     return cards;
+  }
+
+  const [userTokens, setUserTokens] = useState<operations["getTokenBalances"]["responses"]["200"]["content"]["application/json"] & defaultResponse<operations["getTokenBalances"]["responses"]["200"]["content"]["application/json"]>>([]);
+  const ERC20_getUserTokens = async function () {
+    const options:operations["getTokenBalances"]["parameters"]["path"] = {
+      address: await provider?.getSigner().getAddress() ?? ""
+    };
+
+    //API reference: https://docs.moralis.io/moralis-dapp/web3-api/account#gettokenbalances
+    let tokens = await Moralis.Web3API.account.getTokenBalances(options);
+
+    await setUserTokens(tokens);
+    return tokens;
   }
 
   const NFT_getFloorPrice = async function(collection_slug:string) {
@@ -829,16 +842,24 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
-  const txERC20_approveForAirdropPull = async function (user_address:string, token_address:string, quantity:number, decimals:number) {
+  const ERC20_approvedAmount = async function (token_address:string) {
     const erc20Contract = getERC20Contract(token_address)
-    await erc20Contract.methods
-        .approve(luftballonsAddress, quantity*(10**decimals))
+    return await erc20Contract
+        .allowance(address, luftballonsAddress);
   }
 
-  const txERC20_pullAirdrop = async function(user_address:string, token_address:string, quantity:number, decimals:number) {
+  const txERC20_approveForAirdropPull = async function (token_address:string, quantity:number, decimals:number) {
+    const erc20Contract = getERC20Contract(token_address)
+    let number = Number(quantity*(10**decimals));
+    let tx = await erc20Contract
+        .approve(luftballonsAddress, number.toString());
+    return tx;
+  }
+
+  const txERC20_pullAirdrop = async function(token_address:string, quantity:number, decimals:number) {
     const LuftballonsContract = getLuftballonsContract()
     await LuftballonsContract
-        .pullAirdrop(token_address, quantity*(10**decimals))
+        .pullAirdrop(token_address, Number(quantity*(10**decimals)).toString())
   }
 
   const txNFT_setCustomNFTPrice = async function (user_address:string, collection_address:string, burn_price:number) {
@@ -875,6 +896,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
             claimableLuft,
             availableNFTs,
             userLuftballons,
+            userTokens,
             connectToWallet,
             disconnectWallet,
             Luftballons_balanceOf,
@@ -883,6 +905,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
             ERC20_userBalances,
             ERC20_availableAirdrops,
             ERC20_airdroppedQuantity,
+            ERC20_getUserTokens,
             NFT_LuftPerNFT,
             NFT_AvailableNFTs,
             NFT_GetLastSalePrice,
@@ -892,6 +915,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
             txNFT_harvestERC1155Airdrop,
             txNFT_harvestERC721Airdrop,
             txERC20_noticeAirdrop,
+            ERC20_approvedAmount,
             txERC20_approveForAirdropPull,
             txERC20_pullAirdrop,
             txNFT_setCustomNFTPrice,

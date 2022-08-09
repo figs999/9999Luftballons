@@ -15,7 +15,7 @@ import 'swiper/css';
 import '@/assets/css/scrollbar.css';
 import '@/assets/css/globals.css';
 import '@/assets/css/range-slider.css';
-import {MoralisProvider, useMoralis} from "react-moralis";
+import { MoralisProvider, useMoralis } from 'react-moralis';
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
@@ -34,7 +34,10 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
           content="width=device-width, initial-scale=1 maximum-scale=1"
         />
       </Head>
-      <MoralisProvider serverUrl="https://sbiqhzhzxwjq.usemoralis.com:2053/server" appId="DzMrmJs7bp1l39yLtVOPFDrOPo2lKjOT9iosgS9X">
+      <MoralisProvider
+        serverUrl="https://sbiqhzhzxwjq.usemoralis.com:2053/server"
+        appId="DzMrmJs7bp1l39yLtVOPFDrOPo2lKjOT9iosgS9X"
+      >
         <QueryClientProvider client={queryClient}>
           <Hydrate state={pageProps.dehydratedState}>
             <ThemeProvider
@@ -44,8 +47,8 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
             >
               <WalletProvider>
                 {getLayout(<Component {...pageProps} />)}
-                <SettingsButton />
-                <SettingsDrawer />
+                {/*<SettingsButton />*/}
+                {/*<SettingsDrawer />*/}
                 <ModalsContainer />
                 <DrawersContainer />
               </WalletProvider>

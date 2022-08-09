@@ -1,5 +1,6 @@
-import {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import type { NextPageWithLayout } from '@/types';
+import { useDebounce } from 'use-debounce';
 import { motion } from 'framer-motion';
 import cn from 'classnames';
 import { NextSeo } from 'next-seo';
@@ -14,18 +15,20 @@ import { SearchIcon } from '@/components/icons/search';
 import AirdropList from '@/components/farms/list';
 import ActiveLink from '@/components/ui/links/active-link';
 import { FarmsData } from '@/data/static/farms-data';
-import {tokenData, WalletContext} from "@/lib/hooks/use-connect";
+import { tokenData, WalletContext } from '@/lib/hooks/use-connect';
+import {
+  tokenListSort,
+  tokenListStatuses,
+} from '@/data/static/token-list-filters';
+import { useTokenDropsFilters } from '@/lib/hooks/use-token-drops-filters';
 
-const sort = [
-  { id: 1, name: 'Hot' },
-  { id: 2, name: 'APR' },
-  { id: 3, name: 'Earned' },
-  { id: 4, name: 'Total staked' },
-  { id: 5, name: 'Latest' },
-];
+interface IFilterProps {
+  onChange: (event: any) => void;
+  value: string;
+}
 
 function SortList() {
-  const [selectedItem, setSelectedItem] = useState(sort[0]);
+  const [selectedItem, setSelectedItem] = useState(tokenListSort[0]);
 
   return (
     <div className="relative w-full md:w-auto">
@@ -43,7 +46,7 @@ function SortList() {
           leaveTo="opacity-0 translate-y-2"
         >
           <Listbox.Options className="absolute left-0 z-10 mt-2 w-full origin-top-right rounded-lg bg-white p-3 shadow-large dark:bg-light-dark">
-            {sort.map((item) => (
+            {tokenListSort.map((item) => (
               <Listbox.Option key={item.id} value={item}>
                 {({ selected }) => (
                   <div
@@ -65,7 +68,7 @@ function SortList() {
   );
 }
 
-function Search() {
+function Search({ onChange, value }: IFilterProps) {
   return (
     <form
       className="relative flex w-full rounded-full md:w-auto lg:w-64 xl:w-80"
@@ -77,6 +80,8 @@ function Search() {
           className="h-11 w-full appearance-none rounded-lg border-2 border-gray-200 bg-transparent py-1 text-sm tracking-tighter text-gray-900 outline-none transition-all placeholder:text-gray-600 focus:border-gray-900 ltr:pr-5 ltr:pl-10 rtl:pr-10 dark:border-gray-600 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-gray-500"
           placeholder="Search Token Drops"
           autoComplete="off"
+          value={value}
+          onChange={onChange}
         />
         <span className="pointer-events-none absolute flex h-full w-8 cursor-pointer items-center justify-center text-gray-600 hover:text-gray-900 ltr:left-0 ltr:pl-2 rtl:right-0 rtl:pr-2 dark:text-gray-500 sm:ltr:pl-3 sm:rtl:pr-3">
           <SearchIcon className="h-4 w-4" />
@@ -116,36 +121,17 @@ function StackedSwitch() {
   );
 }
 
-function Status() {
-  let [status, setStatus] = useState('live');
-
-  return (
-    <RadioGroup
-      value={status}
-      onChange={setStatus}
-      className="flex items-center sm:gap-3"
-    >
-      <RadioGroup.Option value="live">
+const Status = ({ onChange, value }: IFilterProps) => (
+  <RadioGroup
+    value={value}
+    onChange={onChange}
+    className="flex items-center sm:gap-3"
+  >
+    {tokenListStatuses.map((status) => (
+      <RadioGroup.Option value={status.name}>
         {({ checked }) => (
           <span
-            className={`relative flex h-11 w-20 cursor-pointer items-center justify-center rounded-lg text-center text-xs font-medium tracking-wider sm:w-24 sm:text-sm ${
-              checked ? 'text-white' : 'text-brand'
-            }`}
-          >
-            {checked && (
-              <motion.span
-                className="absolute bottom-0 left-0 right-0 h-full w-full rounded-lg bg-brand shadow-large"
-                layoutId="statusIndicator"
-              />
-            )}
-            <span className="relative">SHOW ALL DROPS</span>
-          </span>
-        )}
-      </RadioGroup.Option>
-      <RadioGroup.Option value="finished">
-        {({ checked }) => (
-          <span
-            className={`relative flex h-11 w-20 cursor-pointer items-center justify-center rounded-lg text-center text-xs font-medium tracking-wider sm:w-24 sm:text-sm ${
+            className={`relative flex h-11 w-auto cursor-pointer items-center justify-center rounded-lg pl-4 pr-4 text-center text-xs font-medium tracking-wider sm:text-sm ${
               checked ? 'text-white' : 'text-brand'
             }`}
           >
@@ -159,19 +145,23 @@ function Status() {
           </span>
         )}
       </RadioGroup.Option>
-    </RadioGroup>
-  );
-}
+    ))}
+  </RadioGroup>
+);
 
 const TokensPage: NextPageWithLayout = () => {
-  const { availableAirdrops, ERC20_availableAirdrops, address } = useContext(WalletContext);
+  const { availableAirdrops, ERC20_availableAirdrops, address } =
+    useContext(WalletContext);
+
+  const { airdropsFilters, handleChangeFilters, filteredAirdrops } =
+    useTokenDropsFilters(availableAirdrops);
 
   useEffect(() => {
     async function checkForAirdrops() {
       await ERC20_availableAirdrops();
     }
 
-    if(address) checkForAirdrops();
+    if (address) checkForAirdrops();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);
 
@@ -184,15 +174,22 @@ const TokensPage: NextPageWithLayout = () => {
       <div className="mx-auto w-full sm:pt-8">
         <div className="relative z-10 mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center md:gap-6">
           <div className="flex items-center justify-between gap-4">
-            <Status />
+            <Status
+              value={airdropsFilters.status}
+              onChange={(e) => handleChangeFilters(e, 'status')}
+            />
           </div>
 
           <div className="flex items-center gap-4 lg:gap-8">
-            <Search />
+            <Search
+              onChange={(e) =>
+                handleChangeFilters(e.target.value, 'searchKeyword')
+              }
+              value={airdropsFilters.searchKeyword}
+            />
             <SortList />
           </div>
         </div>
-
         <div className="mb-3 hidden grid-cols-5 gap-6 rounded-lg bg-white shadow-card dark:bg-light-dark sm:grid lg:grid-cols-5">
           <span className="px-8 py-6 text-sm tracking-wider text-gray-500 dark:text-gray-300">
             Token Name
@@ -210,27 +207,29 @@ const TokensPage: NextPageWithLayout = () => {
             Your Claim
           </span>
         </div>
-
-        {Object.values<tokenData>(availableAirdrops).map((_tokenData:tokenData) => {
-          return (
-            <AirdropList
-                key = {_tokenData.metadata?.address}
-                airdrop = {_tokenData}>
-              <div className="mb-4 grid grid-cols-2 gap-4 sm:mb-6 sm:gap-6">
-                <input
-                  type="number"
-                  placeholder="0.0"
-                  className="spin-button-hidden h-11 appearance-none rounded-lg border-solid border-gray-200 bg-body px-4 text-sm tracking-tighter text-gray-900 placeholder:text-gray-600 focus:border-gray-900 focus:shadow-none focus:outline-none focus:ring-0 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-gray-600 sm:h-13"
-                />
-                <input
-                  type="number"
-                  placeholder="0.0"
-                  className="spin-button-hidden h-11 appearance-none rounded-lg border-solid border-gray-200 bg-body px-4 text-sm tracking-tighter text-gray-900 placeholder:text-gray-600 focus:border-gray-900 focus:shadow-none focus:outline-none focus:ring-0 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-gray-600 sm:h-13"
-                />
-              </div>
-            </AirdropList>
-          );
-        })}
+        {Object.values<tokenData>(filteredAirdrops).map(
+          (_tokenData: tokenData) => {
+            return (
+              <AirdropList
+                key={_tokenData.metadata?.address}
+                airdrop={_tokenData}
+              >
+                <div className="mb-4 grid grid-cols-2 gap-4 sm:mb-6 sm:gap-6">
+                  <input
+                    type="number"
+                    placeholder="0.0"
+                    className="spin-button-hidden h-11 appearance-none rounded-lg border-solid border-gray-200 bg-body px-4 text-sm tracking-tighter text-gray-900 placeholder:text-gray-600 focus:border-gray-900 focus:shadow-none focus:outline-none focus:ring-0 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-gray-600 sm:h-13"
+                  />
+                  <input
+                    type="number"
+                    placeholder="0.0"
+                    className="spin-button-hidden h-11 appearance-none rounded-lg border-solid border-gray-200 bg-body px-4 text-sm tracking-tighter text-gray-900 placeholder:text-gray-600 focus:border-gray-900 focus:shadow-none focus:outline-none focus:ring-0 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-gray-600 sm:h-13"
+                  />
+                </div>
+              </AirdropList>
+            );
+          }
+        )}
       </div>
     </>
   );
