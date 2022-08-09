@@ -25,6 +25,18 @@ const sort = [
   { id: 5, name: 'Latest' },
 ];
 
+const statuses = [
+  { id: 1, name: 'all' },
+  { id: 2, name: 'hideMicro' },
+];
+
+const microDropValue = 10000;
+
+interface IFilterProps {
+  onChange: (event: any) => void;
+  value: string;
+}
+
 function SortList() {
   const [selectedItem, setSelectedItem] = useState(sort[0]);
 
@@ -66,12 +78,7 @@ function SortList() {
   );
 }
 
-interface ISearchProps {
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  value: string;
-}
-
-function Search({ onChange, value }: ISearchProps) {
+function Search({ onChange, value }: IFilterProps) {
   return (
     <form
       className="relative flex w-full rounded-full md:w-auto lg:w-64 xl:w-80"
@@ -124,33 +131,14 @@ function StackedSwitch() {
   );
 }
 
-function Status() {
-  let [status, setStatus] = useState('live');
-
-  return (
-    <RadioGroup
-      value={status}
-      onChange={setStatus}
-      className="flex items-center sm:gap-3"
-    >
-      <RadioGroup.Option value="live">
-        {({ checked }) => (
-          <span
-            className={`relative flex h-11 w-auto cursor-pointer items-center justify-center rounded-lg pl-4 pr-4 text-center text-xs font-medium tracking-wider sm:text-sm ${
-              checked ? 'text-white' : 'text-brand'
-            }`}
-          >
-            {checked && (
-              <motion.span
-                className="absolute bottom-0 left-0 right-0 h-full w-full rounded-lg bg-brand shadow-large"
-                layoutId="statusIndicator"
-              />
-            )}
-            <span className="relative">SHOW ALL DROPS</span>
-          </span>
-        )}
-      </RadioGroup.Option>
-      <RadioGroup.Option value="finished">
+const Status = ({ onChange, value }: IFilterProps) => (
+  <RadioGroup
+    value={value}
+    onChange={onChange}
+    className="flex items-center sm:gap-3"
+  >
+    {statuses.map((status) => (
+      <RadioGroup.Option value={status.name}>
         {({ checked }) => (
           <span
             className={`relative flex h-11 w-auto cursor-pointer items-center justify-center rounded-lg pl-4 pr-4 text-center text-xs font-medium tracking-wider sm:text-sm ${
@@ -167,13 +155,18 @@ function Status() {
           </span>
         )}
       </RadioGroup.Option>
-    </RadioGroup>
-  );
-}
+    ))}
+  </RadioGroup>
+);
 
 const TokensPage: NextPageWithLayout = () => {
-  let [searchKeyword, setSearchKeyword] = useState('');
-  const [searchKeywordDebounced] = useDebounce(searchKeyword, 600);
+  let [airdropsFilters, setAirdropsFilters] = useState({
+    searchKeyword: '',
+    sort: '',
+    status: statuses[0].name,
+  });
+  const [filtersDebounced] = useDebounce(airdropsFilters, 600);
+
   const { availableAirdrops, ERC20_availableAirdrops, address } =
     useContext(WalletContext);
 
@@ -186,30 +179,47 @@ const TokensPage: NextPageWithLayout = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);
 
+  const handleChangeFilters = (value: string, name: string) => {
+    setAirdropsFilters({
+      ...airdropsFilters,
+      [name]: value,
+    });
+  };
+
   const filteredAirdrops = useMemo(
     () =>
       Object.keys(availableAirdrops).reduce((acc, currentKey) => {
+        let filtered = { ...acc };
+        const currentAirdrop = availableAirdrops[currentKey];
         if (
-          availableAirdrops[currentKey].metadata.name
+          currentAirdrop.metadata.name
             .toLowerCase()
-            .includes(searchKeywordDebounced.toLowerCase()) ||
-          availableAirdrops[currentKey].metadata.symbol
+            .includes(filtersDebounced.searchKeyword.toLowerCase()) ||
+          currentAirdrop.metadata.symbol
             .toLowerCase()
-            .includes(searchKeywordDebounced.toLowerCase())
+            .includes(filtersDebounced.searchKeyword.toLowerCase())
         ) {
-          return {
-            ...acc,
+          filtered = {
+            ...filtered,
             [currentKey]: availableAirdrops[currentKey],
           };
         }
-        return acc;
+
+        if (filtersDebounced.status == 'hideMicro') {
+          const value =
+            (currentAirdrop.price.usdPrice * currentAirdrop.value) / 9999;
+          if (value < microDropValue) {
+            delete filtered[currentKey];
+          }
+        }
+
+        return filtered;
       }, {}),
-    [availableAirdrops, searchKeywordDebounced]
+    [availableAirdrops, filtersDebounced]
   );
 
   return (
     <>
-      {console.log(availableAirdrops)}
       <NextSeo
         title="Explore Token Drops"
         description="9999 Luftballons DApp Interface"
@@ -217,13 +227,18 @@ const TokensPage: NextPageWithLayout = () => {
       <div className="mx-auto w-full sm:pt-8">
         <div className="relative z-10 mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center md:gap-6">
           <div className="flex items-center justify-between gap-4">
-            <Status />
+            <Status
+              value={airdropsFilters.status}
+              onChange={(e) => handleChangeFilters(e, 'status')}
+            />
           </div>
 
           <div className="flex items-center gap-4 lg:gap-8">
             <Search
-              onChange={(e) => setSearchKeyword(e.target.value)}
-              value={searchKeyword}
+              onChange={(e) =>
+                handleChangeFilters(e.target.value, 'searchKeyword')
+              }
+              value={airdropsFilters.searchKeyword}
             />
             <SortList />
           </div>
