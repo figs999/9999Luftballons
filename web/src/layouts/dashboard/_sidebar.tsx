@@ -67,11 +67,11 @@ const menuItems = [
     href: "",
     dropdownItems: [
       {
-        name: 'Manage MY NFT Project',
+        name: 'Manage MY NFT Project (COMING SOON)',
         href: "",
       },
       {
-        name: 'Manage ERC20 Luftdrop',
+        name: 'Manage ERC20 Luftdrop (COMING SOON)',
         href: "",
       },
       {
