@@ -16,21 +16,11 @@ import AirdropList from '@/components/farms/list';
 import ActiveLink from '@/components/ui/links/active-link';
 import { FarmsData } from '@/data/static/farms-data';
 import { tokenData, WalletContext } from '@/lib/hooks/use-connect';
-
-const sort = [
-  { id: 1, name: 'Hot' },
-  { id: 2, name: 'APR' },
-  { id: 3, name: 'Earned' },
-  { id: 4, name: 'Total staked' },
-  { id: 5, name: 'Latest' },
-];
-
-const statuses = [
-  { id: 1, name: 'all' },
-  { id: 2, name: 'hideMicro' },
-];
-
-const microDropValue = 10000;
+import {
+  tokenListSort,
+  tokenListStatuses,
+} from '@/data/static/token-list-filters';
+import { useTokenDropsFilters } from '@/lib/hooks/use-token-drops-filters';
 
 interface IFilterProps {
   onChange: (event: any) => void;
@@ -38,7 +28,7 @@ interface IFilterProps {
 }
 
 function SortList() {
-  const [selectedItem, setSelectedItem] = useState(sort[0]);
+  const [selectedItem, setSelectedItem] = useState(tokenListSort[0]);
 
   return (
     <div className="relative w-full md:w-auto">
@@ -56,7 +46,7 @@ function SortList() {
           leaveTo="opacity-0 translate-y-2"
         >
           <Listbox.Options className="absolute left-0 z-10 mt-2 w-full origin-top-right rounded-lg bg-white p-3 shadow-large dark:bg-light-dark">
-            {sort.map((item) => (
+            {tokenListSort.map((item) => (
               <Listbox.Option key={item.id} value={item}>
                 {({ selected }) => (
                   <div
@@ -137,7 +127,7 @@ const Status = ({ onChange, value }: IFilterProps) => (
     onChange={onChange}
     className="flex items-center sm:gap-3"
   >
-    {statuses.map((status) => (
+    {tokenListStatuses.map((status) => (
       <RadioGroup.Option value={status.name}>
         {({ checked }) => (
           <span
@@ -160,15 +150,11 @@ const Status = ({ onChange, value }: IFilterProps) => (
 );
 
 const TokensPage: NextPageWithLayout = () => {
-  let [airdropsFilters, setAirdropsFilters] = useState({
-    searchKeyword: '',
-    sort: '',
-    status: statuses[0].name,
-  });
-  const [filtersDebounced] = useDebounce(airdropsFilters, 600);
-
   const { availableAirdrops, ERC20_availableAirdrops, address } =
     useContext(WalletContext);
+
+  const { airdropsFilters, handleChangeFilters, filteredAirdrops } =
+    useTokenDropsFilters(availableAirdrops);
 
   useEffect(() => {
     async function checkForAirdrops() {
@@ -178,45 +164,6 @@ const TokensPage: NextPageWithLayout = () => {
     if (address) checkForAirdrops();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);
-
-  const handleChangeFilters = (value: string, name: string) => {
-    setAirdropsFilters({
-      ...airdropsFilters,
-      [name]: value,
-    });
-  };
-
-  const filteredAirdrops = useMemo(
-    () =>
-      Object.keys(availableAirdrops).reduce((acc, currentKey) => {
-        let filtered = { ...acc };
-        const currentAirdrop = availableAirdrops[currentKey];
-        if (
-          currentAirdrop.metadata.name
-            .toLowerCase()
-            .includes(filtersDebounced.searchKeyword.toLowerCase()) ||
-          currentAirdrop.metadata.symbol
-            .toLowerCase()
-            .includes(filtersDebounced.searchKeyword.toLowerCase())
-        ) {
-          filtered = {
-            ...filtered,
-            [currentKey]: availableAirdrops[currentKey],
-          };
-        }
-
-        if (filtersDebounced.status == 'hideMicro') {
-          const value =
-            (currentAirdrop.price.usdPrice * currentAirdrop.value) / 9999;
-          if (value < microDropValue) {
-            delete filtered[currentKey];
-          }
-        }
-
-        return filtered;
-      }, {}),
-    [availableAirdrops, filtersDebounced]
-  );
 
   return (
     <>
