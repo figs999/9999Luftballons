@@ -6,6 +6,8 @@ import { Transition } from '@/components/ui/transition';
 import Button from '@/components/ui/button';
 import { Close } from '@/components/icons/close';
 import { useModal, MODAL_VIEW } from '@/components/modal-views/context';
+import ManageERC20Modal from '@/components/modal-views/manage-ERC20-modal';
+import ManageNFTModal from '@/components/modal-views/manage-nft-modal';
 // dynamic imports
 const SearchView = dynamic(() => import('@/components/search/view'));
 const ShareView = dynamic(() => import('@/components/nft/share-view'));
@@ -19,6 +21,10 @@ function renderModalContent(view: MODAL_VIEW | string) {
       return <ShareView />;
     case 'WALLET_CONNECT_VIEW':
       return <SelectWallet />;
+    case 'MANAGE_ERC20':
+      return <ManageERC20Modal />;
+    case 'MANAGE_NFT':
+      return <ManageNFTModal />;
     default:
       return null;
   }
