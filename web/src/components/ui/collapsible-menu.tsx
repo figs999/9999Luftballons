@@ -7,14 +7,14 @@ import ActiveLink from '@/components/ui/links/active-link';
 import { ChevronDown } from '@/components/icons/chevron-down';
 import { MODAL_VIEW, useModal } from '@/components/modal-views/context';
 
-type MenuItemProps = {
+export type MenuItemProps = {
   name: string;
   icon: React.ReactNode;
   href: string;
   dropdownItems?: DropdownItemProps[];
 };
 
-type DropdownItemProps = {
+export type DropdownItemProps = {
   name: string;
   href?: string;
   modal?: MODAL_VIEW;

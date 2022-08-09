@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import AuthorCard from '@/components/ui/author-card';
 import Logo from '@/components/ui/logo';
-import { MenuItem } from '@/components/ui/collapsible-menu';
+import {MenuItem, MenuItemProps} from '@/components/ui/collapsible-menu';
 import Scrollbar from '@/components/ui/scrollbar';
 import Button from '@/components/ui/button';
 import routes from '@/config/routes';
@@ -21,7 +21,7 @@ import { InfoCircle } from '@/components/icons/info-circle';
 //images
 import AuthorImage from '@/assets/images/author.jpg';
 
-const menuItems = [
+const menuItems:MenuItemProps[] = [
   {
     name: 'Home',
     icon: <HomeIcon />,
@@ -68,15 +68,15 @@ const menuItems = [
     dropdownItems: [
       {
         name: 'Manage MY NFT Project (COMING SOON)',
-        modal: 'MANAGE_NFT',
+        modal: 'MANAGE_NFT'
       },
       {
-        name: 'Manage ERC20 Luftdrop (COMING SOON)',
-        modal: 'MANAGE_ERC20',
+        name: 'Send ERC20 Luftdrop',
+        modal: 'MANAGE_ERC20'
       },
       {
         name: 'How to Send?',
-        href: 'https://guide.9999luftballons.io/how-tos/airdrop-erc-20',
+        href: 'https://guide.9999luftballons.io/how-tos/airdrop-erc-20'
       },
     ],
   },
