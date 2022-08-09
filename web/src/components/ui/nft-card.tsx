@@ -96,7 +96,7 @@ export default function NFTGrid({
           </div>
         ):(<div/>)}
         <div className="mt-10 text-sm font-medium text-gray-900 dark:text-white">
-          Last Sale: {price?.toString()}
+          {price?.toString()}
         </div>
         {date ? (
           <div className="mt-2 text-xs font-extralight text-gray-900 dark:text-white">

@@ -596,7 +596,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     let collection = result.data.collection;
 
     return {
-      ether: collection.stats.floor_price * 10**18,
+      ether: +collection.stats.floor_price * 10**18,
       usd: (collection.stats.floor_price / collection.payment_tokens[0].eth_price) * collection.payment_tokens[0].usd_price
     };
   }
@@ -664,9 +664,9 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         image_url: nft.image_url,
         metadata: nft.traits,
         collection_metadata: nft.asset_contract,
-        price: nft.last_sale ? (
+        price: "Last Sale: " + (nft.last_sale ? ((
             (+(nft.last_sale.total_price) * +(nft.last_sale.payment_token.eth_price)) / 10 ** +(nft.last_sale.payment_token.decimals)
-        ) + "e" : "Unknown",
+        ) + "e") : "None"),
         //luft: await NFT_LuftPerNFT(nft.asset_contract.address),
         date: 0
       };
@@ -765,7 +765,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         image_url: nft.image_url,
         metadata: nft.traits,
         collection_metadata: nft.asset_contract,
-        price: (nft.last_sale ? nft.last_sale : ether/10**18)+"e",
+        price: (nft.last_sale?"Last Sale: ":"Floor Price: ")+((nft.last_sale ? nft.last_sale.total_price : ether) / 10**18)+"e",
         date: 0
       });
       setUserLuftballons(results);
