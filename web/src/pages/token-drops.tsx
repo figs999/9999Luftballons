@@ -136,7 +136,7 @@ function Status() {
       <RadioGroup.Option value="live">
         {({ checked }) => (
           <span
-            className={`relative flex h-11 w-20 cursor-pointer items-center justify-center rounded-lg text-center text-xs font-medium tracking-wider sm:w-24 sm:text-sm ${
+            className={`relative flex h-11 w-auto cursor-pointer items-center justify-center rounded-lg pl-4 pr-4 text-center text-xs font-medium tracking-wider sm:text-sm ${
               checked ? 'text-white' : 'text-brand'
             }`}
           >
@@ -153,7 +153,7 @@ function Status() {
       <RadioGroup.Option value="finished">
         {({ checked }) => (
           <span
-            className={`relative flex h-11 w-20 cursor-pointer items-center justify-center rounded-lg text-center text-xs font-medium tracking-wider sm:w-24 sm:text-sm ${
+            className={`relative flex h-11 w-auto cursor-pointer items-center justify-center rounded-lg pl-4 pr-4 text-center text-xs font-medium tracking-wider sm:text-sm ${
               checked ? 'text-white' : 'text-brand'
             }`}
           >
@@ -209,6 +209,7 @@ const TokensPage: NextPageWithLayout = () => {
 
   return (
     <>
+      {console.log(availableAirdrops)}
       <NextSeo
         title="Explore Token Drops"
         description="9999 Luftballons DApp Interface"
