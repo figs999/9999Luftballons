@@ -36,6 +36,7 @@ export default function ManageERC20Modal() {
   const [inputAmount, setInputAmount] = useState<number>();
   const [pendingTransaction, setPendingTransaction] =
     useState<ContractTransaction>();
+  const [isLoading, setIsLoading] = useState(false);
   const [receipt, setReceipt] = useState<ContractReceipt>();
 
   /* This effect will fetch wallet address if user has already connected his/her wallet */
@@ -80,20 +81,36 @@ export default function ManageERC20Modal() {
   }, [receipt]);
 
   const awaitApproval = async function () {
-    let tx = await txERC20_approveForAirdropPull(
-      selectedItem.token_address,
-      inputAmount,
-      selectedItem.decimals
-    );
+    setIsLoading(true);
+    let tx;
+    try {
+      tx = await txERC20_approveForAirdropPull(
+        selectedItem.token_address,
+        inputAmount,
+        selectedItem.decimals
+      );
+      toast.success('Transaction successful1!');
+    } catch (err) {
+      setIsLoading(false);
+    }
+    setIsLoading(false);
     setPendingTransaction(tx);
   };
 
   const sendLuftdrop = async function () {
-    let tx = await txERC20_pullAirdrop(
-      selectedItem.token_address,
-      inputAmount,
-      selectedItem.decimals
-    );
+    setIsLoading(true);
+    let tx;
+    try {
+      tx = await txERC20_pullAirdrop(
+        selectedItem.token_address,
+        inputAmount,
+        selectedItem.decimals
+      );
+      toast.success('Transaction successful2!');
+    } catch (err) {
+      setIsLoading(false);
+    }
+    setIsLoading(false);
     setPendingTransaction(tx);
   };
 
@@ -116,7 +133,6 @@ export default function ManageERC20Modal() {
               10 ** (item.decimals ?? 1);
             setApprovedTokens(approved);
             console.log('APPROVED: ' + approved);
-            toast.success('Transaction successful!');
           }}
         >
           <Listbox.Button
@@ -177,10 +193,11 @@ export default function ManageERC20Modal() {
               : awaitApproval
           }
           className="m-auto w-52 shadow-main hover:shadow-large"
+          isLoading={isLoading}
           color={
             (inputAmount ?? 0) <= (approvedTokens ?? 0) ? 'success' : 'warning'
           }
-          disabled={pendingTransaction != undefined}
+          disabled={pendingTransaction != undefined || isLoading}
         >
           {`${
             (inputAmount ?? 0) <= (approvedTokens ?? 0)
@@ -189,14 +206,6 @@ export default function ManageERC20Modal() {
           }`}
         </Button>
       </div>
-      {/*<div className="mt-10 flex justify-center">*/}
-      {/*  <Button*/}
-      {/*    onClick={closeModal}*/}
-      {/*    className="m-auto shadow-main hover:shadow-large"*/}
-      {/*  >*/}
-      {/*    Submit Transaction*/}
-      {/*  </Button>*/}
-      {/*</div>*/}
     </div>
   );
 }
