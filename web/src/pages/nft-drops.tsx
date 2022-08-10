@@ -1,7 +1,18 @@
-import {Dispatch, SetStateAction, useContext, useEffect, useState} from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { atom, useAtom } from 'jotai';
 import { NextSeo } from 'next-seo';
-import type {GetServerSideProps, GetStaticProps, InferGetServerSidePropsType, InferGetStaticPropsType} from 'next';
+import type {
+  GetServerSideProps,
+  GetStaticProps,
+  InferGetServerSidePropsType,
+  InferGetStaticPropsType,
+} from 'next';
 import type { NextPageWithLayout } from '@/types';
 import Slider from 'rc-slider';
 import { motion } from 'framer-motion';
@@ -20,8 +31,8 @@ import Scrollbar from '@/components/ui/scrollbar';
 import Button from '@/components/ui/button';
 import { Close } from '@/components/icons/close';
 import { NFTList } from '@/data/static/nft-list';
-import {nft, WalletContext} from "@/lib/hooks/use-connect";
-import Moralis from "moralis";
+import { nft, WalletContext } from '@/lib/hooks/use-connect';
+import Moralis from 'moralis';
 
 const gridCompactViewAtom = atom(false);
 function useGridSwitcher() {
@@ -71,10 +82,34 @@ function GridSwitcher() {
 }
 
 const sort = [
-  { id: 1, name: 'LUFT$: Ascending', func: (a:nft,b:nft) => {return (a.luft&&b.luft) ? (a.luft - b.luft) : 0} },
-  { id: 2, name: 'LUFT$: Descending', func: (a:nft,b:nft) => {return (a.luft&&b.luft) ? (b.luft - a.luft) : 0} },
-  { id: 3, name: 'Date Listed: Newest', func: (a:nft,b:nft) => {return b?.date - a?.date} },
-  { id: 4, name: 'Date Listed: Oldest', func: (a:nft,b:nft) => {return a?.date - b?.date} },
+  {
+    id: 1,
+    name: 'LUFT$: Ascending',
+    func: (a: nft, b: nft) => {
+      return a.luft && b.luft ? a.luft - b.luft : 0;
+    },
+  },
+  {
+    id: 2,
+    name: 'LUFT$: Descending',
+    func: (a: nft, b: nft) => {
+      return a.luft && b.luft ? b.luft - a.luft : 0;
+    },
+  },
+  {
+    id: 3,
+    name: 'Date Listed: Newest',
+    func: (a: nft, b: nft) => {
+      return b?.date - a?.date;
+    },
+  },
+  {
+    id: 4,
+    name: 'Date Listed: Oldest',
+    func: (a: nft, b: nft) => {
+      return a?.date - b?.date;
+    },
+  },
 ];
 
 const sortAtom = atom(sort[0]);
@@ -87,7 +122,7 @@ function useSortSwitcher() {
 }
 
 function SortList() {
-  const {sortMethod, setSortMethod} = useSortSwitcher();
+  const { sortMethod, setSortMethod } = useSortSwitcher();
 
   return (
     <div className="relative">
@@ -137,13 +172,13 @@ function useFilterRange() {
 }
 
 function PriceRange() {
-  let {range, setRange} = useFilterRange();
+  let { range, setRange } = useFilterRange();
 
   function handleRangeChange(value: any) {
     setRange({
       min: value[0],
       max: value[1],
-      most: range.most
+      most: range.most,
     });
   }
 
@@ -193,7 +228,7 @@ function PriceRange() {
   );
 }
 
-const collectionAtom = atom<string|undefined>(undefined);
+const collectionAtom = atom<string | undefined>(undefined);
 function useCollectionFilter() {
   const [collection, setCollection] = useAtom(collectionAtom);
   return {
@@ -203,7 +238,7 @@ function useCollectionFilter() {
 }
 
 function Filters() {
-  const {collection, setCollection} = useCollectionFilter();
+  const { collection, setCollection } = useCollectionFilter();
 
   return (
     <>
@@ -250,19 +285,20 @@ export function DrawerFilters() {
 
 export const getStaticProps: GetStaticProps = async () => {
   return {
-    props: { }
-  }
-}
+    props: {},
+  };
+};
 
 const NFTPage: NextPageWithLayout<
-    InferGetServerSidePropsType<typeof getStaticProps>
+  InferGetServerSidePropsType<typeof getStaticProps>
 > = () => {
   const { isGridCompact } = useGridSwitcher();
   const { sortMethod } = useSortSwitcher();
   const { openDrawer } = useDrawer();
-  const { availableNFTs, NFT_AvailableNFTs, address} = useContext(WalletContext);
-  let {range, setRange} = useFilterRange();
-  const {collection, setCollection} = useCollectionFilter();
+  const { availableNFTs, NFT_AvailableNFTs, address } =
+    useContext(WalletContext);
+  let { range, setRange } = useFilterRange();
+  const { collection, setCollection } = useCollectionFilter();
 
   /* This effect will fetch wallet address if user has already connected his/her wallet */
   useEffect(() => {
@@ -271,17 +307,18 @@ const NFTPage: NextPageWithLayout<
       setRange({
         min: 0,
         max: available.sort(sort[1].func)[0].luft,
-        most: available.sort(sort[1].func)[0].luft})
+        most: available.sort(sort[1].func)[0].luft,
+      });
     }
 
-    if(address) getAvailableNFTs();
+    if (address) getAvailableNFTs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);
 
   return (
     <>
       <NextSeo
-        title="Explore NTF Drops"
+        title="Explore NFT Drops"
         description="9999 Luftballons DApp Interface"
       />
       <div className="grid sm:pt-5 2xl:grid-cols-[280px_minmax(auto,_1fr)] 4xl:grid-cols-[320px_minmax(auto,_1fr)]">
@@ -320,21 +357,32 @@ const NFTPage: NextPageWithLayout<
                 : 'grid gap-6 sm:grid-cols-2 md:grid-cols-3 3xl:grid-cols-3 4xl:grid-cols-4'
             }
           >
-            {availableNFTs.filter((element:nft) => {return (collection == undefined || collection.toLowerCase() == (element.collection?.toLowerCase()??"")) && (element.luft??0) <= range.max && (element.luft??0) >= range.min}).sort(sortMethod.func).map((_nft:nft) => (
-              <NFTGrid
-                key={_nft.collection_metadata.address + _nft.id}
-                id={_nft.id}
-                name={_nft.name}
-                image_url={_nft.image_url}
-                thumbnail_url={_nft.thumbnail_url}
-                price={_nft.price}
-                collection={_nft.collection}
-                luft={_nft.luft}
-                metadata={_nft.metadata}
-                collection_metadata={_nft.collection_metadata}
-                date={_nft.date}
-              />
-            ))}
+            {availableNFTs
+              .filter((element: nft) => {
+                return (
+                  (collection == undefined ||
+                    collection.toLowerCase() ==
+                      (element.collection?.toLowerCase() ?? '')) &&
+                  (element.luft ?? 0) <= range.max &&
+                  (element.luft ?? 0) >= range.min
+                );
+              })
+              .sort(sortMethod.func)
+              .map((_nft: nft) => (
+                <NFTGrid
+                  key={_nft.collection_metadata.address + _nft.id}
+                  id={_nft.id}
+                  name={_nft.name}
+                  image_url={_nft.image_url}
+                  thumbnail_url={_nft.thumbnail_url}
+                  price={_nft.price}
+                  collection={_nft.collection}
+                  luft={_nft.luft}
+                  metadata={_nft.metadata}
+                  collection_metadata={_nft.collection_metadata}
+                  date={_nft.date}
+                />
+              ))}
           </div>
         </div>
 
