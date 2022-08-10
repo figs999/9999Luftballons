@@ -1,13 +1,14 @@
-import Button from '@/components/ui/button';
-import { useModal } from '@/components/modal-views/context';
 import React, { useContext, useEffect, useState } from 'react';
+import { defaultResponse, operations } from 'moralis/types/generated/web3Api';
+import { ContractTransaction } from 'ethers/lib/ethers';
+import { ContractReceipt } from 'ethers';
+import { toast } from 'react-hot-toast';
 import { WalletContext } from '@/lib/hooks/use-connect';
 import { Listbox } from '@/components/ui/listbox';
 import { ChevronDown } from '@/components/icons/chevron-down';
 import { Transition } from '@/components/ui/transition';
-import { defaultResponse, operations } from 'moralis/types/generated/web3Api';
-import { ContractTransaction } from 'ethers/lib/ethers';
-import { ContractReceipt } from 'ethers';
+import { useModal } from '@/components/modal-views/context';
+import Button from '@/components/ui/button';
 
 export default function ManageERC20Modal() {
   const { closeModal } = useModal();
@@ -115,6 +116,7 @@ export default function ManageERC20Modal() {
               10 ** (item.decimals ?? 1);
             setApprovedTokens(approved);
             console.log('APPROVED: ' + approved);
+            toast.success('Transaction successful!');
           }}
         >
           <Listbox.Button

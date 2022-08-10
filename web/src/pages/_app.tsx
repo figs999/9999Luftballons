@@ -16,6 +16,7 @@ import '@/assets/css/scrollbar.css';
 import '@/assets/css/globals.css';
 import '@/assets/css/range-slider.css';
 import { MoralisProvider, useMoralis } from 'react-moralis';
+import ToastContainer from '@/components/toast/toast-container';
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
@@ -51,6 +52,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 {/*<SettingsDrawer />*/}
                 <ModalsContainer />
                 <DrawersContainer />
+                <ToastContainer />
               </WalletProvider>
             </ThemeProvider>
           </Hydrate>
