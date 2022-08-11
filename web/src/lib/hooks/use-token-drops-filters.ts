@@ -39,7 +39,7 @@ export const useTokenDropsFilters = (availableAirdrops: {
         };
       }
 
-      if (filtersDebounced.status == 'hideMicro') {
+      if (filtersDebounced.status == tokenListStatuses[1].name) {
         const value =
           (currentAirdrop?.price?.usdPrice * currentAirdrop?.value) / 9999;
         if (value < microDropValue) {

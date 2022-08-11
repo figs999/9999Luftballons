@@ -47,9 +47,12 @@ export default function AirdropList({airdrop}: React.PropsWithChildren<{airdrop:
           {(airdrop?.noticed == airdrop?.value) ? "YES" : (
               <Button
                   onClick={() => txERC20_noticeAirdrop(airdrop?.metadata?.address ?? "")}
-                  className="shadow-main hover:shadow-large"
+                  className="flex shadow-main hover:shadow-large"
+                  color="danger"
               >
-                NOTICE TO CLAIM
+                <div className="flex-auto text-xs">
+                  NOTICE TO CLAIM
+                </div>
               </Button>
           )}
         </div>
@@ -60,10 +63,13 @@ export default function AirdropList({airdrop}: React.PropsWithChildren<{airdrop:
           {(airdrop?.claimable != undefined) ? (
               <Button
                   onClick={async () => txERC20_harvestAirdrops(airdrop?.metadata?.address ?? "")}
-                  className="shadow-main hover:shadow-large"
+                  className="flex shadow-main hover:shadow-large"
                   disabled={airdrop.claimable == 0 || airdrop?.noticed != airdrop?.value}
+                  color="success"
               >
-                {`${(airdrop?.claimable??0).toPrecision(5)} ($${ ((airdrop?.claimable??0) * airdrop?.price?.usdPrice).toPrecision(3)})`}
+                <div className="flex-auto text-xs">
+                  {`${(airdrop?.claimable??0).toPrecision(5)} ($${ ((airdrop?.claimable??0) * airdrop?.price?.usdPrice).toPrecision(3)})`}
+                </div>
               </Button>
           ) : (
             <div>

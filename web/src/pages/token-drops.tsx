@@ -127,7 +127,7 @@ const Status = ({ onChange, value }: IFilterProps) => (
     className="flex items-center sm:gap-3"
   >
     {tokenListStatuses.map((status) => (
-      <RadioGroup.Option value={status.name}>
+      <RadioGroup.Option value={status.name} key={status.name}>
         {({ checked }) => (
           <span
             className={`relative flex h-11 w-auto cursor-pointer items-center justify-center rounded-lg pl-4 pr-4 text-center text-xs font-medium tracking-wider sm:text-sm ${
@@ -140,7 +140,7 @@ const Status = ({ onChange, value }: IFilterProps) => (
                 layoutId="statusIndicator"
               />
             )}
-            <span className="relative">HIDE MICRO DROPS</span>
+            <span className="relative">{status.name}</span>
           </span>
         )}
       </RadioGroup.Option>

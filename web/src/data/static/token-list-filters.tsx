@@ -36,8 +36,8 @@ export const tokenListSort = [
 ];
 
 export const tokenListStatuses = [
-  { id: 1, name: 'all' },
-  { id: 2, name: 'hideMicro' },
+  { id: 1, name: 'Show All' },
+  { id: 2, name: 'Hide Micro' },
 ];
 
 export const microDropValue = 10000;
