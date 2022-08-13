@@ -21,6 +21,7 @@ import erc20ContractABI from '../erc20.abi.json';
 import LuftballonsContractABI from '../luftballons.abi.json';
 import LuftRegistarABI from '../luftregistrar.abi.json';
 import ENSReverseRegistrarABI from '../ensreverseregistrar.abi.json';
+import NFTAbi from '../nft.abi.json';
 
 import Moralis from 'moralis';
 
@@ -716,6 +717,11 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     return result / 10 ** 18;
   };
 
+  const ERC20_luftTotalSupply = async function (): Promise<number> {
+    const LuftContract = getERC20Contract("0xb9f7dba05880100083278156ab24d5fc036c3bb8");
+    return await LuftContract.totalSupply() / 10**18
+  };
+
   const NFT_LuftPerNFT = async function (
     collection_address: string
   ): Promise<number> {
@@ -901,6 +907,27 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     return results;
   };
 
+  const NFT_CollectionName = async function (collection_address: string) {
+    let collection = new Contract(
+        collection_address,
+        NFTAbi,
+        provider?.getSigner()
+    );
+
+    return await collection.name();
+  }
+
+  const NFT_IsOwnerOfCollection = async function (collection_address: string) {
+    let ownable = new Contract(
+        collection_address,
+        NFTAbi,
+        provider?.getSigner()
+    );
+
+    let owner = await ownable.owner();
+    return owner == address;
+  }
+
   const txERC20_harvestAirdrops = async function (token_address: string) {
     const LuftballonsContract = getLuftballonsContract();
     let receipt: ContractTransaction =
@@ -1012,28 +1039,26 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     decimals: number
   ) {
     const LuftballonsContract = getLuftballonsContract();
-    await LuftballonsContract.pullAirdrop(
+    return await LuftballonsContract.pullAirdrop(
       token_address,
       Number(quantity * 10 ** decimals).toString()
     );
   };
 
   const txNFT_setCustomNFTPrice = async function (
-    user_address: string,
     collection_address: string,
     burn_price: number
   ) {
     const LuftballonsContract = getLuftballonsContract();
-    await LuftballonsContract.setCustomNFTPrice(
+    return await LuftballonsContract.setCustomNFTPrice(
       collection_address,
-      burn_price * 10 ** 18
+        (burn_price * 10 ** 18).toString()
     );
   };
 
   const txRegisterENS = async function (balloonID: number) {
     const LuftRegistrarContract = getLuftRegistrarContract();
-    let tx = await LuftRegistrarContract.register(balloonID);
-    let receipt = await tx.wait();
+    return LuftRegistrarContract.register(balloonID);
   };
 
   const txNFT_SetPrimaryENS = async function (
@@ -1073,10 +1098,13 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
           ERC20_availableAirdrops,
           ERC20_airdroppedQuantity,
           ERC20_getUserTokens,
+          ERC20_luftTotalSupply,
           NFT_LuftPerNFT,
           NFT_AvailableNFTs,
           NFT_GetLastSalePrice,
           NFT_UserLuftballons,
+          NFT_IsOwnerOfCollection,
+          NFT_CollectionName,
           txERC20_harvestAirdrops,
           txERC20_claimLuft,
           txNFT_harvestERC1155Airdrop,

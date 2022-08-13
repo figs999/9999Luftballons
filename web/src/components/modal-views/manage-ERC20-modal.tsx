@@ -53,8 +53,13 @@ export default function ManageERC20Modal() {
   useEffect(() => {
     async function awaitReceipt() {
       if (pendingTransaction) {
-        let rpt = await pendingTransaction.wait(1);
-        setReceipt(rpt);
+        try {
+          let rpt = await pendingTransaction.wait(1);
+          setReceipt(rpt);
+        } catch(err:any) {
+          toast.error(`Transaction Failed: ${JSON.stringify(err)}`);
+        }
+        setIsLoading(false);
       }
     }
 
@@ -72,6 +77,7 @@ export default function ManageERC20Modal() {
           10 ** (selectedItem.decimals ?? 1);
         setApprovedTokens(approved);
         setPendingTransaction(undefined);
+        toast.success('Transaction Successful!');
       }
     }
 
@@ -89,11 +95,10 @@ export default function ManageERC20Modal() {
         inputAmount,
         selectedItem.decimals
       );
-      toast.success('Transaction successful1!');
+      toast.success('Transaction Sent!');
     } catch (err) {
       setIsLoading(false);
     }
-    setIsLoading(false);
     setPendingTransaction(tx);
   };
 
@@ -106,11 +111,10 @@ export default function ManageERC20Modal() {
         inputAmount,
         selectedItem.decimals
       );
-      toast.success('Transaction successful2!');
+      toast.success('Transaction Sent!');
     } catch (err) {
       setIsLoading(false);
     }
-    setIsLoading(false);
     setPendingTransaction(tx);
   };
 

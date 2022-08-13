@@ -67,7 +67,7 @@ const menuItems:MenuItemProps[] = [
     href: '',
     dropdownItems: [
       {
-        name: 'Manage MY NFT Project (COMING SOON)',
+        name: 'Set Project $LUFT Fee',
         modal: 'MANAGE_NFT'
       },
       {
@@ -75,8 +75,8 @@ const menuItems:MenuItemProps[] = [
         modal: 'MANAGE_ERC20'
       },
       {
-        name: 'How to Send?',
-        href: 'https://guide.9999luftballons.io/how-tos/airdrop-erc-20'
+        name: 'How to Send NFT?',
+        href: 'https://guide.9999luftballons.io/how-tos/airdrop-erc-721-1155'
       },
     ],
   },

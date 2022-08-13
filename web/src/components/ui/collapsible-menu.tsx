@@ -81,6 +81,8 @@ export function MenuItem({ name, icon, href, dropdownItems }: MenuItemProps) {
                   {item.href ? (
                     <ActiveLink
                       href={item.href}
+                      target={item.href.startsWith("/")?"":"_blank"}
+                      rel={item.href.startsWith("/")?"":"noreferrer"}
                       className="flex items-center rounded-lg p-3 text-sm text-gray-500 transition-all before:h-1 before:w-1 before:rounded-full before:bg-gray-500 hover:text-brand ltr:pl-6 before:ltr:mr-5 rtl:pr-6 before:rtl:ml-5 dark:hover:text-white"
                       activeClassName="!text-brand dark:!text-white dark:before:!bg-white before:!bg-brand before:!w-2 before:!h-2 before:-ml-0.5 before:ltr:!mr-[18px] before:rtl:!ml-[18px] !font-medium"
                     >
@@ -104,6 +106,8 @@ export function MenuItem({ name, icon, href, dropdownItems }: MenuItemProps) {
       ) : (
         <ActiveLink
           href={href}
+          target={href.startsWith("/")?"":"_blank"}
+          rel={href.startsWith("/")?"":"noreferrer"}
           className="relative flex h-12 items-center whitespace-nowrap rounded-lg px-4 text-sm text-gray-500 transition-all hover:text-brand dark:hover:text-white"
           activeClassName=" !text-white"
         >
