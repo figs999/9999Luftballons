@@ -10,7 +10,7 @@ import CoinbaseWalletSDK from '@coinbase/wallet-sdk';
 // @ts-ignore
 import { Web3Auth } from '@web3auth/web3auth';
 import { MoralisProvider, useMoralis } from 'react-moralis';
-import axios from 'axios';
+import axios, {AxiosResponse} from 'axios';
 import {
   components,
   defaultResponse,
@@ -289,9 +289,11 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       console.log('Signer ' + signer);
       if (signer) {
         const web3Address = await signer.getAddress();
-        setAddress(web3Address);
-        console.log('Logged In Moralis');
-        await getBalance(web3Address);
+        if(web3Address != address) {
+          setAddress(web3Address);
+          console.log('Logged In Moralis');
+          await getBalance(web3Address);
+        }
       }
     } catch (error) {
       console.log(
@@ -386,13 +388,13 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     connection.on('chainChanged', async (chainId: number) => {
       setChainId(chainId);
       if (chainId != 1) await switchNetwork();
-      await setWalletAddress();
+      //await setWalletAddress();
     });
 
     connection.on('networkChanged', async (networkId: number) => {
       setNetworkID(networkId);
       if (networkId != 1) await switchNetwork();
-      await setWalletAddress();
+      //await setWalletAddress();
     });
 
     return p;
@@ -863,25 +865,49 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     return last_price;
   };
 
+  function timeout(ms:number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   const [userLuftballons, setUserLuftballons] = useState<nft[]>([]);
   const NFT_UserLuftballons = async function (
     user_address: string
   ): Promise<nft[]> {
-    let os_url = `https://api.opensea.io/api/v1/assets?owner=${user_address}&collection=9999-luftballons`;
-    let result = await axios.get(os_url, {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-KEY': process.env.OPEN_SEA ?? '',
-      },
-    });
+    let rawResults = [];
+    let next = "";
+    while(true) {
+      let os_url = `https://api.opensea.io/api/v1/assets?owner=${user_address}&collection=9999-luftballons`;
+      if(next?.length > 0)
+        os_url += "&cursor="+next;
+
+      let result:AxiosResponse = await new Promise( (resolve,err) =>
+          axios.get(os_url, {
+            headers: {
+              'Content-Type': 'application/json',
+              'X-API-KEY': process.env.OPEN_SEA ?? '',
+            },
+          }).then(result =>
+              resolve(result)
+          ).catch(error => err(error))
+      );
+
+      for (let i = 0; i < result.data?.assets?.length; i++) {
+        rawResults.push(result.data.assets[i]);
+      }
+
+      if(result.data?.next == null)
+        break;
+      else
+        next = result.data?.next;
+    }
 
     let results: nft[] = [];
     let ids: number[] = [];
 
     let { ether } = await NFT_getFloorPrice('9999-luftballons');
 
-    for (let i = 0; i < result.data?.assets?.length; i++) {
-      let nft = result.data.assets[i];
+    for (let i = 0; i < rawResults.length; i++) {
+      let nft = rawResults[i];
       ids.push(nft.token_id);
       results.push({
         name: nft.name,
