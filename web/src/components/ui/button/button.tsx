@@ -3,6 +3,7 @@ import cn from 'classnames';
 import ButtonDrip from '@/components/ui/button/button-drip';
 import ButtonLoader from '@/components/ui/button/button-loader';
 import { LoaderSizeTypes, LoaderVariantTypes } from '@/components/ui/loader';
+import { thinBorder } from '@/data/static/classNames';
 type ShapeNames = 'rounded' | 'pill' | 'circle';
 type VariantNames = 'ghost' | 'solid' | 'transparent';
 type ColorNames =
@@ -17,7 +18,7 @@ type SizeNames = 'large' | 'medium' | 'small' | 'mini';
 
 const shapes: Record<ShapeNames, string[]> = {
   rounded: ['rounded-md sm:rounded-lg'],
-  pill: ['rounded-full'],
+  pill: ['rounded-2xl'],
   circle: ['rounded-full'],
 };
 const variants: Record<VariantNames, string[]> = {
@@ -29,7 +30,7 @@ const colors: Record<ColorNames, string[]> = {
   primary: ['text-brand', 'bg-brand', 'border-brand'],
   white: ['text-gray-900', 'bg-white', 'border-white'],
   gray: ['text-gray-900', 'bg-gray-100', 'border-gray-100'],
-  success: ['text-green-500', 'bg-green-500', 'border-green-500'],
+  success: ['text-green-500', 'bg-brand', thinBorder],
   info: ['text-blue-500', 'bg-blue-500', 'border-blue-500'],
   warning: ['text-yellow-500', 'bg-yellow-500', 'border-yellow-500'],
   danger: ['text-red-500', 'bg-red-500', 'border-red-500'],

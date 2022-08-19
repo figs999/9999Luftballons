@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import cn from 'classnames';
 import { defaultResponse, operations } from 'moralis/types/generated/web3Api';
 import { ContractTransaction } from 'ethers/lib/ethers';
 import { ContractReceipt } from 'ethers';
@@ -9,6 +10,8 @@ import { ChevronDown } from '@/components/icons/chevron-down';
 import { Transition } from '@/components/ui/transition';
 import { useModal } from '@/components/modal-views/context';
 import Button from '@/components/ui/button';
+import Input from '@/components/ui/forms/input';
+import { thinBorder, wideBorder } from '@/data/static/classNames';
 
 export default function ManageERC20Modal() {
   const { closeModal } = useModal();
@@ -119,13 +122,18 @@ export default function ManageERC20Modal() {
   };
 
   return (
-    <div className="border-3 border-black bg-accent p-4 shadow-modal">
-      <div className="border-3 border-black bg-body px-5 pt-5 pb-7 sm:px-7 sm:pb-8 sm:pt-6">
-        <div className="text-center text-lg font-medium -tracking-wide text-gray-900 dark:text-white lg:text-xl">
+    <div className={cn('bg-accent p-4 shadow-modal', wideBorder)}>
+      <div
+        className={cn(
+          'bg-body px-5 pt-5 pb-7 sm:px-7 sm:pb-8 sm:pt-6',
+          wideBorder
+        )}
+      >
+        <div className="text-center text-lg font-medium -tracking-wide lg:text-3xl">
           Send ERC20 Luftdrop
         </div>
         <div className="mt-5 flex w-full items-center">
-          <div className="w-1/4 whitespace-nowrap text-sm font-medium -tracking-wide text-gray-900 ltr:text-left rtl:text-right dark:text-white lg:text-sm">
+          <div className="w-16 whitespace-nowrap text-sm font-medium -tracking-wide text-gray-900 ltr:text-left rtl:text-right dark:text-white lg:text-sm">
             Token:
           </div>
           <Listbox
@@ -141,7 +149,10 @@ export default function ManageERC20Modal() {
             }}
           >
             <Listbox.Button
-              className="ml-8 flex h-12 w-full items-center rounded-lg bg-gray-100 px-4 text-right text-sm text-gray-900 dark:bg-light-dark dark:text-white"
+              className={cn(
+                ' flex h-12 w-96 items-center bg-gray-100 px-4 text-right text-sm',
+                thinBorder
+              )}
               disabled={true}
             >
               <div className="w-full flex-grow text-left">
@@ -181,16 +192,18 @@ export default function ManageERC20Modal() {
           </Listbox>
         </div>
         <div className="mt-5 flex w-full items-center">
-          <div className="w-32 whitespace-nowrap text-sm font-medium -tracking-wide text-gray-900 ltr:text-left rtl:text-right dark:text-white lg:text-sm">
+          <div className="w-16 whitespace-nowrap text-sm font-medium -tracking-wide text-gray-900 ltr:text-left rtl:text-right dark:text-white lg:text-sm">
             Qty:
           </div>
-          <input
-            className="ml-5 mr-5 h-12 w-64 appearance-none rounded-full border-2 border-gray-200 py-1 text-sm tracking-tighter text-gray-900 outline-none transition-all placeholder:text-gray-600 focus:border-gray-900 ltr:pr-5 ltr:pl-5 rtl:pl-5 rtl:pr-11 dark:border-gray-600 dark:bg-light-dark dark:text-white dark:placeholder:text-gray-500 dark:focus:border-gray-500"
+          <Input
+            inputClassName="w-96"
             placeholder="How Many?"
             autoComplete="off"
             type="number"
             onChange={(event) => setInputAmount(+event.target.value)}
           />
+        </div>
+        <div className="mt-7 flex w-full items-center">
           <Button
             onClick={
               (inputAmount ?? 0) <= (approvedTokens ?? 0)

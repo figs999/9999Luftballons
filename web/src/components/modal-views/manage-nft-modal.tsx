@@ -5,6 +5,7 @@ import { WalletContext } from '@/lib/hooks/use-connect';
 import { ContractTransaction } from 'ethers/lib/ethers';
 import { ContractReceipt } from 'ethers';
 import { toast } from 'react-hot-toast';
+import Input from '@/components/ui/forms/input';
 
 export default function ManageNFTModal() {
   const { closeModal } = useModal();
@@ -107,7 +108,7 @@ export default function ManageNFTModal() {
   return (
     <div className="border-3 border-black bg-accent p-4 shadow-modal">
       <div className="border-3 border-black bg-body px-5 pt-5 pb-7 sm:px-7 sm:pb-8 sm:pt-6">
-        <div className="text-center text-lg font-medium -tracking-wide text-gray-900 dark:text-white lg:text-xl">
+        <div className="text-center text-lg font-medium -tracking-wide lg:text-3xl">
           Manage Collection's $LUFT Burn Fee
         </div>
         <label className="mt-2 flex w-full items-center">
@@ -115,12 +116,12 @@ export default function ManageNFTModal() {
             ($LUFT Total Supply: {luftSupply})
           </div>
         </label>
-        <label className="mt-5 mb-8 flex w-full items-center">
-          <div className="w-44 whitespace-nowrap text-sm font-medium -tracking-wide text-gray-900 ltr:text-left rtl:text-right dark:text-white lg:text-sm">
+        <label className="mt-5 mb-4 flex w-full items-center">
+          <div className="w-72 whitespace-nowrap text-sm font-medium -tracking-wide lg:text-sm">
             Collection Address:
           </div>
-          <input
-            className="ml-5 h-12 w-64 appearance-none rounded-full border-2 border-gray-200 py-1 text-sm tracking-tighter text-gray-900 outline-none transition-all placeholder:text-gray-600 focus:border-gray-900 ltr:pr-5 ltr:pl-5 rtl:pl-5 rtl:pr-11 dark:border-gray-600 dark:bg-light-dark dark:text-white dark:placeholder:text-gray-500 dark:focus:border-gray-500"
+          <Input
+            className="ml-6 h-12 w-full"
             placeholder="Type address"
             autoComplete="off"
             onChange={(event) => {
@@ -146,27 +147,27 @@ export default function ManageNFTModal() {
           <div />
         )}
         <label className="mt-1 flex w-full items-center">
-          <div className="mr-0 flex-grow text-left text-xs font-medium text-gray-700">
+          <div className="mr-0 text-left text-xs font-medium text-gray-700">
             Collection Name:
           </div>
-          <div className="ml-0 flex-grow text-right text-xs font-black text-gray-700">
+          <div className="ml-2 text-right text-xs font-black text-gray-700">
             {collectionName}
           </div>
         </label>
         <label className="mt-1 flex w-full items-center">
-          <div className="flex-grow  text-left text-xs font-medium text-gray-700">
+          <div className="text-left text-xs font-medium text-gray-700">
             Current $LUFT Burn Fee:
           </div>
-          <div className="flex-grow  text-right text-xs font-black text-gray-700">
+          <div className="ml-2 text-xs font-black text-gray-700">
             {collectionBurnFee}
           </div>
         </label>
-        <label className="mt-8 flex w-full items-center">
-          <div className="w-44 whitespace-nowrap text-sm font-medium -tracking-wide text-gray-900 ltr:text-left rtl:text-right dark:text-white lg:text-sm">
+        <label className="mt-4 flex w-full items-center">
+          <div className="w-72 whitespace-nowrap text-sm font-medium -tracking-wide lg:text-sm">
             Desired $LUFT Burn Fee:
           </div>
-          <input
-            className="ml-5 h-12 w-64 appearance-none rounded-full border-2 border-gray-200 py-1 text-sm tracking-tighter text-gray-900 outline-none transition-all placeholder:text-gray-600 focus:border-gray-900 ltr:pr-5 ltr:pl-5 rtl:pl-5 rtl:pr-11 dark:border-gray-600 dark:bg-light-dark dark:text-white dark:placeholder:text-gray-500 dark:focus:border-gray-500"
+          <Input
+            className="ml-6 h-12 w-full"
             placeholder="Type fee amount"
             autoComplete="off"
             type="number"
