@@ -3,7 +3,10 @@
 @tailwind utilities;
 @layer base {
   :root {
-    --color-brand: 17 24 39;
+    --color-brand: 229 195 198;
+    --color-brand-hex: #E5C3C6;
+    --color-background: 249 97 97;
+    --color-background-hex: #F96161;
   }
   html,
   body {

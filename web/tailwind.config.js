@@ -19,7 +19,7 @@ module.exports = {
     extend: {
       colors: {
         brand: 'rgb(var(--color-brand) / <alpha-value>)',
-        body: '#fcfcfc',
+        body: 'rgb(var(--color-background) / <alpha-value>)',
         dark: '#0D1321',
         'light-dark': '#171e2e',
       },
