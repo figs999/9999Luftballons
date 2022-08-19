@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import AuthorCard from '@/components/ui/author-card';
 import Logo from '@/components/ui/logo';
-import {MenuItem, MenuItemProps} from '@/components/ui/collapsible-menu';
+import { MenuItem, MenuItemProps } from '@/components/ui/collapsible-menu';
 import Scrollbar from '@/components/ui/scrollbar';
 import Button from '@/components/ui/button';
 import routes from '@/config/routes';
@@ -21,7 +21,7 @@ import { InfoCircle } from '@/components/icons/info-circle';
 //images
 import AuthorImage from '@/assets/images/author.jpg';
 
-const menuItems:MenuItemProps[] = [
+const menuItems: MenuItemProps[] = [
   {
     name: 'Home',
     icon: <HomeIcon />,
@@ -68,15 +68,15 @@ const menuItems:MenuItemProps[] = [
     dropdownItems: [
       {
         name: 'Set Project $LUFT Fee',
-        modal: 'MANAGE_NFT'
+        modal: 'MANAGE_NFT',
       },
       {
         name: 'Send ERC20 Luftdrop',
-        modal: 'MANAGE_ERC20'
+        modal: 'MANAGE_ERC20',
       },
       {
         name: 'How to Send NFT?',
-        href: 'https://guide.9999luftballons.io/how-tos/airdrop-erc-721-1155'
+        href: 'https://guide.9999luftballons.io/how-tos/airdrop-erc-721-1155',
       },
     ],
   },
@@ -91,7 +91,7 @@ export default function Sidebar({ className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'top-0 z-40 h-full w-full bg-slate-200 max-w-full border-dashed border-gray-200 bg-body ltr:left-0 ltr:border-r rtl:right-0 rtl:border-l dark:border-gray-700 dark:bg-dark xs:w-80 xl:fixed  xl:w-72 2xl:w-80',
+        'top-0 z-40 h-full w-full max-w-full border-dashed border-gray-200 bg-body ltr:left-0 ltr:border-r rtl:right-0 rtl:border-l dark:border-gray-700 dark:bg-dark xs:w-80 xl:fixed  xl:w-72 2xl:w-80',
         className
       )}
     >
