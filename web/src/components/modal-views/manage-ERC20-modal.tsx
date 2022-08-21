@@ -150,7 +150,7 @@ export default function ManageERC20Modal() {
           >
             <Listbox.Button
               className={cn(
-                ' flex h-12 w-96 items-center bg-gray-100 px-4 text-right text-sm',
+                'flex h-12 w-96 items-center rounded-2xl bg-accentinput bg-gray-100 px-4 text-right text-sm',
                 thinBorder
               )}
               disabled={true}

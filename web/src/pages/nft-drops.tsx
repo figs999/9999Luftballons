@@ -7,6 +7,7 @@ import {
 } from 'react';
 import { atom, useAtom } from 'jotai';
 import { NextSeo } from 'next-seo';
+import cn from 'classnames';
 import type {
   GetServerSideProps,
   GetStaticProps,
@@ -33,6 +34,8 @@ import { Close } from '@/components/icons/close';
 import { NFTList } from '@/data/static/nft-list';
 import { nft, WalletContext } from '@/lib/hooks/use-connect';
 import Moralis from 'moralis';
+import { thinBorder } from '@/data/static/classNames';
+import Input from '@/components/ui/forms/input';
 
 const gridCompactViewAtom = atom(false);
 function useGridSwitcher() {
@@ -46,17 +49,17 @@ function useGridSwitcher() {
 function GridSwitcher() {
   const { isGridCompact, setIsGridCompact } = useGridSwitcher();
   return (
-    <div className="flex overflow-hidden rounded-lg">
+    <div className={cn('flex overflow-hidden rounded-lg', thinBorder)}>
       <button
-        className={`relative flex h-11 w-11 items-center justify-center bg-gray-100 transition dark:bg-gray-800 ${
-          !isGridCompact ? 'z-10 text-white' : 'text-brand dark:text-white'
+        className={`relative flex h-11 w-11 items-center justify-center bg-white bg-gray-100 transition dark:bg-gray-800 ${
+          !isGridCompact ? 'z-10 text-white' : 'text-black dark:text-white'
         }`}
         onClick={() => setIsGridCompact(!isGridCompact)}
         aria-label="Normal Grid"
       >
         {!isGridCompact && (
           <motion.span
-            className="absolute left-0 right-0 bottom-0 h-full w-full bg-brand shadow-large"
+            className="absolute left-0 right-0 bottom-0 h-full w-full bg-accentinput shadow-large"
             layoutId="gridSwitchIndicator"
           />
         )}
@@ -64,14 +67,14 @@ function GridSwitcher() {
       </button>
       <button
         className={`relative flex h-11 w-11 items-center justify-center bg-gray-100 transition dark:bg-gray-800 ${
-          isGridCompact ? 'z-10 text-white' : 'text-brand dark:text-white'
+          isGridCompact ? 'z-10 text-white' : 'text-black dark:text-white'
         }`}
         onClick={() => setIsGridCompact(!isGridCompact)}
         aria-label="Normal Grid"
       >
         {isGridCompact && (
           <motion.span
-            className="absolute left-0 right-0 bottom-0 h-full w-full  bg-brand shadow-large"
+            className="absolute left-0 right-0 bottom-0 h-full w-full bg-accentinput shadow-large"
             layoutId="gridSwitchIndicator"
           />
         )}
@@ -127,7 +130,12 @@ function SortList() {
   return (
     <div className="relative">
       <Listbox value={sortMethod} onChange={setSortMethod}>
-        <Listbox.Button className="flex h-10 w-auto items-center justify-between rounded-lg bg-gray-100 px-4 text-xs text-gray-900 dark:bg-gray-800 dark:text-white sm:w-56 sm:text-sm lg:h-11">
+        <Listbox.Button
+          className={cn(
+            'flex h-10 w-auto items-center justify-between rounded-lg bg-accentinput bg-gray-100 px-4 text-xs text-gray-900 dark:bg-gray-800 dark:text-white sm:w-56 sm:text-sm lg:h-11',
+            thinBorder
+          )}
+        >
           {sortMethod.name}
           <ChevronDown className="ltr:ml-2 rtl:mr-2" />
         </Listbox.Button>
@@ -196,11 +204,10 @@ function PriceRange() {
     });
   }
 
-  console.log(range);
   return (
     <div className="p-5">
-      <div className="mb-4 grid grid-cols-2 gap-2">
-        <input
+      <div className="mb-8 mb-4 grid grid-cols-2 gap-2">
+        <Input
           className="h-9 rounded-lg border-gray-200 text-sm text-gray-900 outline-none focus:border-gray-900 focus:outline-none focus:ring-0 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-gray-500"
           type="number"
           value={range.min}
@@ -208,7 +215,7 @@ function PriceRange() {
           min="0"
           max={range.max}
         />
-        <input
+        <Input
           className="h-9 rounded-lg border-gray-200 text-sm text-gray-900 outline-none focus:border-gray-900 focus:outline-none focus:ring-0 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-gray-500"
           type="number"
           value={range.max}
@@ -322,7 +329,7 @@ const NFTPage: NextPageWithLayout<
         description="9999 Luftballons DApp Interface"
       />
       <div className="grid sm:pt-5 2xl:grid-cols-[280px_minmax(auto,_1fr)] 4xl:grid-cols-[320px_minmax(auto,_1fr)]">
-        <div className="hidden border-dashed border-gray-200 ltr:border-r ltr:pr-8 rtl:border-l rtl:pl-8 dark:border-gray-700 2xl:block">
+        <div className="hidden border-r-2 border-dashed border-black ltr:pr-8 rtl:pl-8 dark:border-gray-700 2xl:block">
           <Filters />
         </div>
 

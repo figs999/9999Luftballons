@@ -17,6 +17,8 @@ import {
   tokenListStatuses,
 } from '@/data/static/token-list-filters';
 import { useTokenDropsFilters } from '@/lib/hooks/use-token-drops-filters';
+import { thinBorder, wideBorder } from '@/data/static/classNames';
+import Input from '@/components/ui/forms/input';
 
 interface IFilterProps {
   onChange: (event: any) => void;
@@ -32,7 +34,12 @@ function SortList({ onChange, value }: IFilterProps) {
   return (
     <div className="relative w-full md:w-auto">
       <Listbox value={selectedItem} onChange={onChange}>
-        <Listbox.Button className="flex h-11 w-full items-center justify-between rounded-lg bg-gray-100 px-4 text-sm text-gray-900 dark:bg-light-dark dark:text-white md:w-36 lg:w-40 xl:w-56">
+        <Listbox.Button
+          className={cn(
+            'flex h-12 w-full items-center justify-between rounded-2xl bg-accentinput bg-gray-100 px-4 text-sm text-gray-900 dark:bg-light-dark dark:text-white md:w-36 lg:w-40 xl:w-56',
+            thinBorder
+          )}
+        >
           {selectedItem ? selectedItem.name : 'Select'}
           <ChevronDown />
         </Listbox.Button>
@@ -75,9 +82,9 @@ function Search({ onChange, value }: IFilterProps) {
       role="search"
     >
       <label className="flex w-full items-center">
-        <input
-          className="h-11 w-full appearance-none rounded-lg border-2 border-gray-200 bg-transparent py-1 text-sm tracking-tighter text-gray-900 outline-none transition-all placeholder:text-gray-600 focus:border-gray-900 ltr:pr-5 ltr:pl-10 rtl:pr-10 dark:border-gray-600 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-gray-500"
+        <Input
           placeholder="Search Token Drops"
+          inputClassName="pr-5 pl-10"
           autoComplete="off"
           value={value}
           onChange={onChange}
@@ -131,12 +138,15 @@ const Status = ({ onChange, value }: IFilterProps) => (
         {({ checked }) => (
           <span
             className={`relative flex h-11 w-auto cursor-pointer items-center justify-center rounded-lg pl-4 pr-4 text-center text-xs font-medium tracking-wider sm:text-sm ${
-              checked ? 'text-white' : 'text-brand'
+              checked ? 'text-black' : 'text-white'
             }`}
           >
             {checked && (
               <motion.span
-                className="absolute bottom-0 left-0 right-0 h-full w-full rounded-lg bg-brand shadow-large"
+                className={cn(
+                  'absolute bottom-0 left-0 right-0 h-full w-full rounded-lg bg-brand shadow-button',
+                  wideBorder
+                )}
                 layoutId="statusIndicator"
               />
             )}
@@ -192,20 +202,20 @@ const TokensPage: NextPageWithLayout = () => {
             />
           </div>
         </div>
-        <div className="mb-3 hidden grid-cols-5 gap-6 rounded-lg bg-white shadow-card dark:bg-light-dark sm:grid lg:grid-cols-5">
-          <span className="px-8 py-6 text-sm tracking-wider text-gray-500 dark:text-gray-300">
+        <div className="custom-bordered mb-3 hidden grid-cols-5 gap-6 rounded-lg bg-accentalt dark:bg-light-dark sm:grid lg:grid-cols-5">
+          <span className="px-8 py-6 text-sm tracking-wider dark:text-gray-300">
             Token Name
           </span>
-          <span className="px-8 py-6 text-sm tracking-wider text-gray-500 dark:text-gray-300">
+          <span className="px-8 py-6 text-sm tracking-wider dark:text-gray-300">
             Airdrop/Balloon
           </span>
-          <span className="px-8 py-6 text-sm tracking-wider text-gray-500 dark:text-gray-300">
+          <span className="px-8 py-6 text-sm tracking-wider dark:text-gray-300">
             USD/Balloon
           </span>
-          <span className="px-8 py-6 text-sm tracking-wider text-gray-500 dark:text-gray-300">
+          <span className="px-8 py-6 text-sm tracking-wider dark:text-gray-300">
             Fully Noticed
           </span>
-          <span className="px-8 py-6 text-sm tracking-wider text-gray-500 dark:text-gray-300">
+          <span className="px-8 py-6 text-sm tracking-wider dark:text-gray-300">
             Your Claim
           </span>
         </div>

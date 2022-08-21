@@ -9,6 +9,10 @@
     --color-background-hex: #F96161;
     --color-accent: 188 210 208;
     --color-accent-hex: #BCD2D0;
+    --color-accent-alt: 225 223 183;
+    --color-accent-alt-hex: #E1E9B7;
+    --color-accent-input: 223 229 215;
+    --color-accent-input-hex: #dfe5d7;
   }
   html,
   body {
@@ -118,6 +122,11 @@ Styles for Swiper slider
   border-spacing: 0 12px;
   margin-top: -12px;
 }
+.custom-bordered {
+  border-width: 3px 3px 6px 3px;
+  border-color: black;
+}
+
 .transaction-table > thead tr > th {
   text-align: left;
 }

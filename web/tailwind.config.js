@@ -21,6 +21,8 @@ module.exports = {
         brand: 'rgb(var(--color-brand) / <alpha-value>)',
         body: 'rgb(var(--color-background) / <alpha-value>)',
         accent: 'rgb(var(--color-accent) / <alpha-value>)',
+        accentalt: 'rgb(var(--color-accent-alt) / <alpha-value>)',
+        accentinput: 'rgb(var(--color-accent-input) / <alpha-value>)',
         dark: '#0D1321',
         'light-dark': '#171e2e',
       },
@@ -52,9 +54,10 @@ module.exports = {
         large: '0px 8px 16px rgba(17, 24, 39, 0.1)',
         card: '0px 2px 6px rgba(0, 0, 0, 0.06)',
         modal: '-16px 12px 0px 0px rgba(0,0,0,1)',
+        button: '4px 6px 0px 0px rgba(0,0,0,1)',
         transaction: '0px 8px 16px rgba(17, 24, 39, 0.06)',
-        button:
-          '0px 2px 4px rgba(0, 0, 0, 0.06), 0px 4px 6px rgba(0, 0, 0, 0.1)',
+        // button:
+        //   '0px 2px 4px rgba(0, 0, 0, 0.06), 0px 4px 6px rgba(0, 0, 0, 0.1)',
       },
       dropShadow: {
         main: '0px 4px 8px rgba(0, 0, 0, 0.08)',

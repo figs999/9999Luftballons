@@ -1,4 +1,4 @@
-import {useContext, useState} from 'react';
+import React, { useContext, useState } from 'react';
 import { StaticImageData } from 'next/image';
 import { SearchIcon } from '@/components/icons/search';
 import Avatar from '@/components/ui/avatar';
@@ -6,7 +6,8 @@ import CollectionImage1 from '@/assets/images/collection/collection-1.jpg';
 import CollectionImage2 from '@/assets/images/collection/collection-2.jpg';
 import CollectionImage3 from '@/assets/images/collection/collection-3.jpg';
 import CollectionImage4 from '@/assets/images/collection/collection-4.jpg';
-import {nft, WalletContext} from "@/lib/hooks/use-connect";
+import { nft, WalletContext } from '@/lib/hooks/use-connect';
+import Input from '@/components/ui/forms/input';
 
 export const collectionList = [
   {
@@ -44,15 +45,20 @@ export default function CollectionSelect({ onSelect }: CollectionSelectTypes) {
   let [searchKeyword, setSearchKeyword] = useState('');
   const { availableNFTs } = useContext(WalletContext);
 
-  let coinListData:string[] = (availableNFTs?.map((item:nft) => item.collection)
-      .filter((value: any, index: any, self: string | any[]) => self.indexOf(value) === index)) ?? [];
+  let coinListData: string[] =
+    availableNFTs
+      ?.map((item: nft) => item.collection)
+      .filter(
+        (value: any, index: any, self: string | any[]) =>
+          self.indexOf(value) === index
+      ) ?? [];
 
-  if(coinListData.length > 0) {
+  if (coinListData.length > 0) {
     if (searchKeyword.length > 0) {
       coinListData = coinListData.filter(function (collection) {
         return (
-            collection.match(searchKeyword) ||
-            (collection.toLowerCase().match(searchKeyword) && collection)
+          collection.match(searchKeyword) ||
+          (collection.toLowerCase().match(searchKeyword) && collection)
         );
       });
     }
@@ -63,28 +69,35 @@ export default function CollectionSelect({ onSelect }: CollectionSelectTypes) {
   }
 
   return (
-    <div className="w-full rounded-lg bg-white text-sm shadow-large dark:bg-light-dark">
+    <div className="mt-4 w-full rounded-lg bg-accent text-sm shadow-large dark:bg-light-dark">
       <div className="relative">
-        <SearchIcon className="absolute left-6 h-full text-gray-700 dark:text-white" />
-        <input
-          type="search"
-          autoFocus={true}
-          onChange={(e) => setSearchKeyword(e.target.value)}
-          placeholder="Search..."
-          className="w-full border-x-0 border-b border-dashed border-gray-200 py-3.5 pl-14 pr-6 text-sm focus:border-gray-300 focus:ring-0 dark:border-gray-600 dark:bg-light-dark dark:text-white dark:focus:border-gray-500"
-        />
+        <label className="relative flex w-full items-center">
+          <Input
+            type="search"
+            autoFocus={true}
+            onChange={(e) => setSearchKeyword(e.target.value)}
+            placeholder="Search..."
+            className="w-full px-4"
+            inputClassName="pl-10"
+          />
+          <span className="pointer-events-none absolute flex h-full w-8 cursor-pointer items-center justify-center text-gray-600 hover:text-gray-900 ltr:left-4 ltr:pl-2 rtl:right-0 rtl:pr-2 dark:text-gray-500 sm:ltr:pl-3 sm:rtl:pr-3">
+            <SearchIcon className="h-4 w-4" />
+          </span>
+        </label>
       </div>
       <ul role="listbox" className="py-3">
-        { coinListData ? (
-            coinListData.map(collection => (
+        {coinListData ? (
+          coinListData.map((collection) => (
             <li
               key={collection}
               role="listitem"
-              tabIndex={availableNFTs.map((item:nft) => item.collection).indexOf(collection)}
+              tabIndex={availableNFTs
+                .map((item: nft) => item.collection)
+                .indexOf(collection)}
               onClick={() => handleSelectedCoin(collection)}
-              className="mb-1 flex cursor-pointer items-center gap-3 py-1.5 px-6 outline-none hover:bg-gray-100 focus:bg-gray-200 dark:hover:bg-gray-700 dark:focus:bg-gray-600"
+              className="mb-1 flex cursor-pointer items-center gap-3 py-1.5 px-6 text-black outline-none hover:bg-body hover:text-white focus:bg-body focus:text-white dark:hover:bg-gray-700 dark:focus:bg-gray-600"
             >
-              <span className="text-sm tracking-tight text-gray-600 dark:text-white">
+              <span className="text-sm tracking-tight dark:text-white">
                 {collection}
               </span>
             </li>

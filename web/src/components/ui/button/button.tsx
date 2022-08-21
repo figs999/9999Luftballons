@@ -23,14 +23,14 @@ const shapes: Record<ShapeNames, string[]> = {
 };
 const variants: Record<VariantNames, string[]> = {
   ghost: ['bg-transparent'],
-  solid: ['text-white'],
+  solid: ['text-black'],
   transparent: ['bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800'],
 };
 const colors: Record<ColorNames, string[]> = {
   primary: ['text-brand', 'bg-brand', 'border-brand'],
   white: ['text-gray-900', 'bg-white', 'border-white'],
   gray: ['text-gray-900', 'bg-gray-100', 'border-gray-100'],
-  success: ['text-green-500', 'bg-brand', thinBorder],
+  success: ['text-black', 'bg-brand', thinBorder],
   info: ['text-blue-500', 'bg-blue-500', 'border-blue-500'],
   warning: ['text-yellow-500', 'bg-yellow-500', 'border-yellow-500'],
   danger: ['text-red-500', 'bg-red-500', 'border-red-500'],
