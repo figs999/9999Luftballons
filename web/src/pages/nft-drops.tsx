@@ -51,7 +51,7 @@ function GridSwitcher() {
   return (
     <div className={cn('flex overflow-hidden rounded-lg', thinBorder)}>
       <button
-        className={`relative flex h-11 w-11 items-center justify-center bg-white bg-gray-100 transition dark:bg-gray-800 ${
+        className={`relative flex h-11 w-11 items-center justify-center bg-white bg-accentinput transition dark:bg-gray-800 ${
           !isGridCompact ? 'z-10 text-white' : 'text-black dark:text-white'
         }`}
         onClick={() => setIsGridCompact(!isGridCompact)}
@@ -59,14 +59,14 @@ function GridSwitcher() {
       >
         {!isGridCompact && (
           <motion.span
-            className="absolute left-0 right-0 bottom-0 h-full w-full bg-accentinput shadow-large"
+            className="absolute left-0 right-0 bottom-0 h-full w-full bg-accent shadow-large"
             layoutId="gridSwitchIndicator"
           />
         )}
         <NormalGridIcon className="relative" />
       </button>
       <button
-        className={`relative flex h-11 w-11 items-center justify-center bg-gray-100 transition dark:bg-gray-800 ${
+        className={`relative flex h-11 w-11 items-center justify-center bg-accentinput transition dark:bg-gray-800 ${
           isGridCompact ? 'z-10 text-white' : 'text-black dark:text-white'
         }`}
         onClick={() => setIsGridCompact(!isGridCompact)}
@@ -74,7 +74,7 @@ function GridSwitcher() {
       >
         {isGridCompact && (
           <motion.span
-            className="absolute left-0 right-0 bottom-0 h-full w-full bg-accentinput shadow-large"
+            className="absolute left-0 right-0 bottom-0 h-full w-full bg-accent shadow-large"
             layoutId="gridSwitchIndicator"
           />
         )}
