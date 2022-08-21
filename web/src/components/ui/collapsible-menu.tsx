@@ -74,13 +74,13 @@ export function MenuItem({ name, icon, href, dropdownItems }: MenuItemProps) {
           >
             <ul ref={ref}>
               {dropdownItems.map((item, index) => (
-                <li className="first:pt-2" key={index}>
+                <li className="last:pb-2" key={index}>
                   {item.href ? (
                     <ActiveLink
                       href={item.href}
                       target={item.href.startsWith('/') ? '' : '_blank'}
                       rel={item.href.startsWith('/') ? '' : 'noreferrer'}
-                      className="flex items-center rounded-lg p-3 text-sm transition-all before:h-1 before:w-1 before:rounded-full before:bg-gray-600 hover:text-white ltr:pl-6 before:ltr:mr-5 rtl:pr-6 before:rtl:ml-5 dark:hover:text-white"
+                      className="flex items-center rounded-lg p-3 text-sm font-black transition-all before:h-1 before:w-1 before:rounded-full before:bg-gray-600 hover:text-white ltr:pl-6 before:ltr:mr-5 rtl:pr-6 before:rtl:ml-5 dark:hover:text-white"
                       activeClassName="!text-brand dark:!text-white dark:before:!bg-white before:!bg-brand before:!w-2 before:!h-2 before:-ml-0.5 before:ltr:!mr-[18px] before:rtl:!ml-[18px] !font-medium"
                     >
                       {item.name}
@@ -90,7 +90,7 @@ export function MenuItem({ name, icon, href, dropdownItems }: MenuItemProps) {
                       onClick={() =>
                         item.modal ? openModal(item.modal) : null
                       }
-                      className="flex cursor-pointer items-center rounded-lg p-3 text-sm transition-all before:h-1 before:w-1 before:rounded-full before:bg-gray-600 hover:text-white ltr:pl-6 before:ltr:mr-5 rtl:pr-6 before:rtl:ml-5 dark:hover:text-white"
+                      className="flex cursor-pointer font-black items-center rounded-lg p-3 text-sm transition-all before:h-1 before:w-1 before:rounded-full before:bg-gray-600 hover:text-white ltr:pl-6 before:ltr:mr-5 rtl:pr-6 before:rtl:ml-5 dark:hover:text-white"
                     >
                       {item.name}
                     </div>
@@ -106,7 +106,6 @@ export function MenuItem({ name, icon, href, dropdownItems }: MenuItemProps) {
           target={href.startsWith('/') ? '' : '_blank'}
           rel={href.startsWith('/') ? '' : 'noreferrer'}
           className="relative flex h-12 items-center whitespace-nowrap rounded-lg px-4 text-sm transition-all hover:text-white dark:hover:text-white"
-          activeClassName=" !text-white"
         >
           <span className="relative z-[1] ltr:mr-3 rtl:ml-3">{icon}</span>
           <span className="relative z-[1]"> {name}</span>

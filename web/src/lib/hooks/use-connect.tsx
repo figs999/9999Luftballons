@@ -124,6 +124,7 @@ export type nft = {
   collection_metadata?: any;
   date: number;
   ensState?: number;
+  harvestableLuft?: number;
 };
 
 export type tokenData = {
@@ -715,7 +716,6 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   ): Promise<number> {
     const LuftballonsContract = getLuftballonsContract();
     let result = await LuftballonsContract.claimableLuft(luftballonsIDs);
-    await setClaimableLuft(result / 10 ** 18);
     return result / 10 ** 18;
   };
 
@@ -905,10 +905,11 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     let ids: number[] = [];
 
     let { ether } = await NFT_getFloorPrice('9999-luftballons');
-
+    let harvestable = 0;
     for (let i = 0; i < rawResults.length; i++) {
       let nft = rawResults[i];
       ids.push(nft.token_id);
+      let luft = await ERC20_claimableLuft([nft.token_id]);
       results.push({
         name: nft.name,
         id: nft.token_id,
@@ -922,14 +923,16 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
           (nft.last_sale ? nft.last_sale.total_price : ether) / 10 ** 18 +
           'e',
         date: 0,
+        harvestableLuft: luft
       });
+      harvestable += luft;
       setUserLuftballons(results);
     }
 
     setUserLuftballons(results);
 
     NFT_LuftballonENSClaimed(results);
-    ERC20_claimableLuft(ids);
+    setClaimableLuft(harvestable);
     return results;
   };
 
@@ -966,10 +969,13 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     setAvailableAirdrops(availableAirdrops);
   };
 
-  const txERC20_claimLuft = async function () {
+  const txERC20_claimLuft = async function (minLuft:number) {
     const LuftballonsContract = getLuftballonsContract();
+    let filteredBalloons = userLuftballons.filter(element => {return (element.harvestableLuft??0) > minLuft});
+    if(filteredBalloons.length == 0) return;
+
     let receipt: ContractTransaction = await LuftballonsContract.claimLuft(
-      userLuftballons.map((b) => b.id)
+        filteredBalloons.map((b) => b.id)
     );
     await receipt.wait(1);
     await setClaimableLuft(0);

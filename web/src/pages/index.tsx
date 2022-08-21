@@ -23,7 +23,7 @@ const HomePage: NextPageWithLayout<
         title="9999Luftballons"
         description="9999Luftballons - DApp Interface"
       />
-      <div className="flex flex-wrap">
+      <div className="flex flex-wrap mt-3">
         <div className="mb-8 w-full sm:mb-0 sm:ltr:pr-6 sm:rtl:pl-6">
           <CoinSlider coins={userBalances} />
         </div>

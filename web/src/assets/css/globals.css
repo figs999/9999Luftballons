@@ -3,16 +3,18 @@
 @tailwind utilities;
 @layer base {
   :root {
-    --color-brand: 229 195 198;
-    --color-brand-hex: #E5C3C6;
+    --color-brand: 252 214 214;
+    --color-brand-hex: #fcd6d6;
     --color-background: 249 97 97;
     --color-background-hex: #F96161;
-    --color-accent: 188 210 208;
-    --color-accent-hex: #BCD2D0;
-    --color-accent-alt: 225 223 183;
-    --color-accent-alt-hex: #E1E9B7;
-    --color-accent-input: 223 229 215;
-    --color-accent-input-hex: #dfe5d7;
+    --color-accent: 168 214 225;
+    --color-accent-hex: #a8d6e1;
+    --color-accent-alt: 235 245 185;
+    --color-accent-alt-hex: #ebf5b9;
+    --color-accent-input: 220 245 245;
+    --color-accent-input-hex: #dcf5f5;
+    --color-accent-dark: 147 187 210;
+    --color-accent-dark-hex: #93c8c8;
   }
   html,
   body {
@@ -23,6 +25,15 @@
   }
   .dynamic-html p {
     @apply mb-3;
+  }
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type=number] {
+    -moz-appearance: textfield;
   }
 }
 
@@ -127,7 +138,6 @@ Styles for Swiper slider
   border-color: black;
 }
 .nft-card-img-container:before {
-  display: block;
   content: '';
   position: absolute;
   top: -1px;
@@ -135,6 +145,10 @@ Styles for Swiper slider
   width: calc(100% + 2px);
   height: calc(100% + 1px);
   background: black;
+  border-width: 3px 3px 6px 3px;
+  border-color: black;
+  border-bottom-left-radius: 2%;
+  border-bottom-right-radius: 2%;
 }
 
 .transaction-table > thead tr > th {

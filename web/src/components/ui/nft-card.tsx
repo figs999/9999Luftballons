@@ -18,6 +18,7 @@ export default function NFTGrid({
   collection_metadata,
   date,
   ensState,
+  harvestableLuft
 }: nft) {
   const {
     txNFT_harvestERC721Airdrop,
@@ -50,6 +51,7 @@ export default function NFTGrid({
       >
         <div className="nft-card-img-container">
           <Image
+            className="rounded-xl -translate-y-1"
             src={image_url ?? ''}
             placeholder="blur"
             blurDataURL={thumbnail_url ?? ''}
@@ -75,8 +77,8 @@ export default function NFTGrid({
           {collection}
         </AnchorLink>
         {luft ? (
-          <div className="mt-8">
-            Claim:
+          <div className="mt-3 rounded-lg p-2 text-center bg-accentinput custom-bordered text-lg font-black text-gray-900 dark:text-white">
+            Claim NFT
             <div className="mt-2 text-center text-sm font-medium text-gray-900 dark:text-white">
               <Button
                 onClick={() => claimNFT(collection_metadata.address, id)}
@@ -93,11 +95,11 @@ export default function NFTGrid({
         )}
         {ensState != undefined ? (
           <div
-            className="mt-3 rounded-lg p-2 text-center text-lg font-black text-gray-900 dark:text-white"
-            style={{ backgroundColor: '#d8f7bb' }}
+            className="flex-grow w-full mt-3 rounded-lg p-2 block text-center bg-accentinput custom-bordered font-black text-gray-900 dark:text-white"
           >
-            {id}.THELUFTBALLONS.ETH DOMAIN
-            <br />
+            <div className="text-sm font-black">
+              {id}.THELUFTBALLONS.ETH
+            </div>
             <div className="bottom-8 mt-2 text-center">
               <Button
                 onClick={async () => {
@@ -119,7 +121,14 @@ export default function NFTGrid({
         ) : (
           <div />
         )}
-        <div className="mt-10 text-sm font-medium text-gray-900 dark:text-white">
+        {harvestableLuft ? (
+            <div className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+              Harvestable Luft: {harvestableLuft}
+            </div>
+        ) : (
+            <div/>
+        )}
+        <div className="mt-2 text-xs font-medium text-gray-900 dark:text-white">
           {price?.toString()}
         </div>
         {date ? (

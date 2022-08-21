@@ -23,6 +23,7 @@ module.exports = {
         accent: 'rgb(var(--color-accent) / <alpha-value>)',
         accentalt: 'rgb(var(--color-accent-alt) / <alpha-value>)',
         accentinput: 'rgb(var(--color-accent-input) / <alpha-value>)',
+        accentdark: 'rgb(var(--color-accent-dark) / <alpha-value>)',
         dark: '#0D1321',
         'light-dark': '#171e2e',
       },

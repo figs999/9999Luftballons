@@ -133,7 +133,7 @@ export default function TransactionTable() {
 
   return (
     <div className="mt-5">
-      <div className="rounded-tl-lg rounded-tr-lg bg-accent px-4 pt-6 dark:bg-light-dark md:px-8 md:pt-8">
+      <div className="rounded-lg custom-bordered rounded-tr-lg bg-accent px-4 pt-6 dark:bg-light-dark md:px-8 md:pt-8">
         <div className="flex flex-col items-center justify-between border-b border-dashed border-gray-200 pb-5 dark:border-gray-700 md:flex-row">
           <h2 className="mb-3 shrink-0 text-lg font-medium uppercase text-black dark:text-white sm:text-xl md:mb-0 md:text-2xl">
             My Luftballons
@@ -142,7 +142,7 @@ export default function TransactionTable() {
       </div>
       {userLuftballons.length > 0 ? (
         <div className="-mx-0.5">
-          <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5">
+          <div className="grid mt-0.5 gap-5 sm:grid-cols-2 md:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5">
             {userLuftballons.map((NFT: nft) => (
               <NFTGrid
                 key={NFT.id}
@@ -155,6 +155,7 @@ export default function TransactionTable() {
                 collection_metadata={NFT.collection_metadata}
                 date={NFT.date}
                 ensState={NFT.ensState}
+                harvestableLuft={NFT.harvestableLuft}
               />
             ))}
           </div>
