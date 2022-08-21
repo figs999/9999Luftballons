@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react';
+import React, { useContext, useEffect } from 'react';
 import cn from 'classnames';
 import {
   useTable,
@@ -16,11 +16,11 @@ import { LinkIcon } from '@/components/icons/link-icon';
 import { TransactionData } from '@/data/static/transaction-data';
 import { useBreakpoint } from '@/lib/hooks/use-breakpoint';
 import { useIsMounted } from '@/lib/hooks/use-is-mounted';
-import {NFTList} from "@/data/static/nft-list";
-import NFTGrid from "@/components/ui/nft-card";
-import {nft, WalletContext, WalletProvider} from "@/lib/hooks/use-connect";
-import AuthorImage from "@/assets/images/author.jpg";
-import NFT1 from "@/assets/images/nft/nft-1.jpg";
+import { NFTList } from '@/data/static/nft-list';
+import NFTGrid from '@/components/ui/nft-card';
+import { nft, WalletContext, WalletProvider } from '@/lib/hooks/use-connect';
+import AuthorImage from '@/assets/images/author.jpg';
+import NFT1 from '@/assets/images/nft/nft-1.jpg';
 
 const COLUMNS = [
   {
@@ -132,7 +132,7 @@ export default function TransactionTable() {
   const { userLuftballons } = useContext(WalletContext);
 
   return (
-    <div className="">
+    <div className="mt-5">
       <div className="rounded-tl-lg rounded-tr-lg bg-white px-4 pt-6 dark:bg-light-dark md:px-8 md:pt-8">
         <div className="flex flex-col items-center justify-between border-b border-dashed border-gray-200 pb-5 dark:border-gray-700 md:flex-row">
           <h2 className="mb-3 shrink-0 text-lg font-medium uppercase text-black dark:text-white sm:text-xl md:mb-0 md:text-2xl">
@@ -141,29 +141,27 @@ export default function TransactionTable() {
         </div>
       </div>
       {userLuftballons.length > 0 ? (
-      <div className="-mx-0.5">
-        <div
-            className='grid gap-5 sm:grid-cols-2 md:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5'
-        >
-          {userLuftballons.map((NFT:nft) => (
+        <div className="-mx-0.5">
+          <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5">
+            {userLuftballons.map((NFT: nft) => (
               <NFTGrid
-                  key={NFT.id}
-                  image_url={NFT.image_url??""}
-                  thumbnail_url={NFT.thumbnail_url}
-                  price={NFT.price}
-                  collection={NFT.collection}
-                  id={NFT.id}
-                  name={NFT.name}
-                  collection_metadata={NFT.collection_metadata}
-                  date={NFT.date}
-                  ensState={NFT.ensState}
+                key={NFT.id}
+                image_url={NFT.image_url ?? ''}
+                thumbnail_url={NFT.thumbnail_url}
+                price={NFT.price}
+                collection={NFT.collection}
+                id={NFT.id}
+                name={NFT.name}
+                collection_metadata={NFT.collection_metadata}
+                date={NFT.date}
+                ensState={NFT.ensState}
               />
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
-          ) : (
-      <div/>
-          )}
+      ) : (
+        <div />
+      )}
     </div>
   );
 }
