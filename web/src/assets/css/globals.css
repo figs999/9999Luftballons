@@ -126,6 +126,17 @@ Styles for Swiper slider
   border-width: 3px 3px 6px 3px;
   border-color: black;
 }
+.nft-card-img-container:before {
+  display: block;
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 1px);
+  background: black;
+  border-radius: 0.5rem;
+}
 
 .transaction-table > thead tr > th {
   text-align: left;
