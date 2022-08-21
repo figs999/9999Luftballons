@@ -135,7 +135,6 @@ Styles for Swiper slider
   width: calc(100% + 2px);
   height: calc(100% + 1px);
   background: black;
-  border-radius: 0.5rem;
 }
 
 .transaction-table > thead tr > th {

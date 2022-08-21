@@ -10,14 +10,15 @@ import { useContext } from 'react';
 
 export default function WalletConnect() {
   const { openModal } = useModal();
-  const { address, connectToWallet, disconnectWallet, balance, error } = useContext(WalletContext);
+  const { address, connectToWallet, disconnectWallet, balance, error } =
+    useContext(WalletContext);
   return (
     <>
       {address ? (
         <div className="flex items-center gap-3 sm:gap-6 lg:gap-8">
           <div className="relative">
             <Menu>
-              <Menu.Button className="block h-10 w-10 overflow-hidden rounded-full border-3 border-solid border-white bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-main transition-all hover:-translate-y-0.5 hover:shadow-large dark:border-gray-700 sm:h-12 sm:w-12"></Menu.Button>
+              <Menu.Button className="block h-10 w-10 overflow-hidden rounded-full border-3 border-solid border-black bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-main transition-all hover:-translate-y-0.5 hover:shadow-large dark:border-gray-700 sm:h-12 sm:w-12"></Menu.Button>
               <Transition
                 enter="ease-out duration-300"
                 enterFrom="opacity-0 translate-y-4"
@@ -26,7 +27,7 @@ export default function WalletConnect() {
                 leaveFrom="opacity-100 translate-y-0"
                 leaveTo="opacity-0 translate-y-4"
               >
-                <Menu.Items className="absolute -right-20 mt-3 w-72 origin-top-right rounded-lg bg-white shadow-large dark:bg-gray-900 sm:-right-14">
+                <Menu.Items className="custom-bordered absolute -right-20 mt-3 w-72 origin-top-right rounded-lg bg-accent shadow-large dark:bg-gray-900 sm:-right-14">
                   <Menu.Item>
                     <Menu.Item>
                       <div className="border-b border-dashed border-gray-200 px-6 py-5 dark:border-gray-700">

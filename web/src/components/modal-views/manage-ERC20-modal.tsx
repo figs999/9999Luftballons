@@ -11,7 +11,11 @@ import { Transition } from '@/components/ui/transition';
 import { useModal } from '@/components/modal-views/context';
 import Button from '@/components/ui/button';
 import Input from '@/components/ui/forms/input';
-import { thinBorder, wideBorder } from '@/data/static/classNames';
+import {
+  thinBorder,
+  wideBorder,
+  listBoxOptionsClassNames,
+} from '@/data/static/classNames';
 
 export default function ManageERC20Modal() {
   const { closeModal } = useModal();
@@ -136,60 +140,68 @@ export default function ManageERC20Modal() {
           <div className="w-16 whitespace-nowrap text-sm font-medium -tracking-wide text-gray-900 ltr:text-left rtl:text-right dark:text-white lg:text-sm">
             Token:
           </div>
-          <Listbox
-            value={selectedItem}
-            onChange={async (item) => {
-              setSelectedItem(item);
-              setApprovedTokens(0);
-              let approved =
-                (await ERC20_approvedAmount(item.token_address)) /
-                10 ** (item.decimals ?? 1);
-              setApprovedTokens(approved);
-              console.log('APPROVED: ' + approved);
-            }}
-          >
-            <Listbox.Button
-              className={cn(
-                'flex h-12 w-96 items-center rounded-2xl bg-accentinput bg-gray-100 px-4 text-right text-sm',
-                thinBorder
-              )}
-              disabled={true}
+          <div className="relative">
+            <Listbox
+              value={selectedItem}
+              onChange={async (item) => {
+                setSelectedItem(item);
+                setApprovedTokens(0);
+                let approved =
+                  (await ERC20_approvedAmount(item.token_address)) /
+                  10 ** (item.decimals ?? 1);
+                setApprovedTokens(approved);
+                console.log('APPROVED: ' + approved);
+              }}
             >
-              <div className="w-full flex-grow text-left">
-                {selectedItem.name} (Balance:{' '}
-                {Number(selectedItem.balance ?? 0) /
-                  10 ** Number(selectedItem.decimals ?? 1)}
-                )
-              </div>
-              <ChevronDown />
-            </Listbox.Button>
-            <Transition
-              enter="ease-out duration-100"
-              enterFrom="opacity-0"
-              enterTo="opacity-100"
-              leave="ease-in duration-100"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-            >
-              <Listbox.Options className="absolute right-0 left-20 z-10 mt-2 ml-12 origin-top-right rounded-lg bg-white p-3 text-right shadow-large dark:bg-light-dark">
-                {userTokens.map((item) => (
-                  <Listbox.Option key={item.token_address} value={item}>
-                    {({ selected }) => (
-                      <div
-                        className={`block cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition dark:text-white  ${
-                          selected
-                            ? 'my-1 bg-gray-100 dark:bg-dark'
-                            : 'hover:bg-gray-50 dark:hover:bg-gray-700'
-                        }`}
-                      >
-                        {item.name}
-                      </div>
-                    )}
-                  </Listbox.Option>
-                ))}
-              </Listbox.Options>
-            </Transition>
-          </Listbox>
+              <Listbox.Button
+                className={cn(
+                  'relative z-20 flex h-12 w-96 items-center rounded-2xl bg-accentinput bg-gray-100 px-4 text-right text-sm',
+                  thinBorder
+                )}
+                disabled={true}
+              >
+                <div className="w-full flex-grow text-left">
+                  {selectedItem.name} (Balance:{' '}
+                  {Number(selectedItem.balance ?? 0) /
+                    10 ** Number(selectedItem.decimals ?? 1)}
+                  )
+                </div>
+                <ChevronDown />
+              </Listbox.Button>
+              <Transition
+                enter="ease-out duration-100"
+                enterFrom="opacity-0"
+                enterTo="opacity-100"
+                leave="ease-in duration-100"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <Listbox.Options
+                  className={cn(
+                    'origin-top-right bg-accent p-3 pt-16 text-right shadow-large dark:bg-light-dark',
+                    thinBorder,
+                    listBoxOptionsClassNames
+                  )}
+                >
+                  {userTokens.map((item) => (
+                    <Listbox.Option key={item.token_address} value={item}>
+                      {({ selected }) => (
+                        <div
+                          className={`block cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition dark:text-white  ${
+                            selected
+                              ? 'my-1 bg-accentalt dark:bg-dark'
+                              : 'hover:bg-accentalt dark:hover:bg-gray-700'
+                          }`}
+                        >
+                          {item.name}
+                        </div>
+                      )}
+                    </Listbox.Option>
+                  ))}
+                </Listbox.Options>
+              </Transition>
+            </Listbox>
+          </div>
         </div>
         <div className="mt-5 flex w-full items-center">
           <div className="w-16 whitespace-nowrap text-sm font-medium -tracking-wide text-gray-900 ltr:text-left rtl:text-right dark:text-white lg:text-sm">

@@ -17,7 +17,11 @@ import {
   tokenListStatuses,
 } from '@/data/static/token-list-filters';
 import { useTokenDropsFilters } from '@/lib/hooks/use-token-drops-filters';
-import { thinBorder, wideBorder } from '@/data/static/classNames';
+import {
+  listBoxOptionsClassNames,
+  thinBorder,
+  wideBorder,
+} from '@/data/static/classNames';
 import Input from '@/components/ui/forms/input';
 
 interface IFilterProps {
@@ -36,7 +40,7 @@ function SortList({ onChange, value }: IFilterProps) {
       <Listbox value={selectedItem} onChange={onChange}>
         <Listbox.Button
           className={cn(
-            'flex h-12 w-full items-center justify-between rounded-2xl bg-accentinput bg-gray-100 px-4 text-sm text-gray-900 dark:bg-light-dark dark:text-white md:w-36 lg:w-40 xl:w-56',
+            'relative z-20 flex h-12 w-full items-center justify-between rounded-2xl bg-accentinput bg-gray-100 px-4 text-sm text-gray-900 dark:bg-light-dark dark:text-white md:w-36 lg:w-40 xl:w-56',
             thinBorder
           )}
         >
@@ -44,22 +48,28 @@ function SortList({ onChange, value }: IFilterProps) {
           <ChevronDown />
         </Listbox.Button>
         <Transition
-          enter="ease-out duration-200"
-          enterFrom="opacity-0 translate-y-2"
+          enter="ease-out duration-100"
+          enterFrom="opacity-0"
           enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100 -translate-y-0"
-          leaveTo="opacity-0 translate-y-2"
+          leave="ease-in duration-100"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
         >
-          <Listbox.Options className="absolute left-0 z-10 mt-2 w-full origin-top-right rounded-lg bg-white p-3 shadow-large dark:bg-light-dark">
+          <Listbox.Options
+            className={cn(
+              'origin-top-right bg-accent p-3 pt-16 shadow-large dark:bg-light-dark',
+              thinBorder,
+              listBoxOptionsClassNames
+            )}
+          >
             {tokenListSort.map((item) => (
               <Listbox.Option key={item.id} value={item}>
                 {({ selected }) => (
                   <div
                     className={`block cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition dark:text-white  ${
                       selected
-                        ? 'my-1 bg-gray-100 dark:bg-dark'
-                        : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                        ? 'my-1 bg-accentalt dark:bg-dark'
+                        : 'hover:bg-accentalt dark:hover:bg-gray-700'
                     }`}
                   >
                     {item.name}
@@ -138,7 +148,7 @@ const Status = ({ onChange, value }: IFilterProps) => (
         {({ checked }) => (
           <span
             className={`relative flex h-11 w-auto cursor-pointer items-center justify-center rounded-lg pl-4 pr-4 text-center text-xs font-medium tracking-wider sm:text-sm ${
-              checked ? 'text-black' : 'text-white'
+              checked ? 'text-black' : 'text-accentalt'
             }`}
           >
             {checked && (

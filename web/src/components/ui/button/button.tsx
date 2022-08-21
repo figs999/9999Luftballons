@@ -27,13 +27,13 @@ const variants: Record<VariantNames, string[]> = {
   transparent: ['bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800'],
 };
 const colors: Record<ColorNames, string[]> = {
-  primary: ['text-brand', 'bg-brand', 'border-brand'],
-  white: ['text-gray-900', 'bg-white', 'border-white'],
-  gray: ['text-gray-900', 'bg-gray-100', 'border-gray-100'],
+  primary: ['text-brand', 'bg-brand', thinBorder],
+  white: ['text-gray-900', 'bg-white', thinBorder],
+  gray: ['text-gray-900', 'bg-gray-100', thinBorder],
   success: ['text-black', 'bg-brand', thinBorder],
-  info: ['text-blue-500', 'bg-blue-500', 'border-blue-500'],
-  warning: ['text-yellow-500', 'bg-yellow-500', 'border-yellow-500'],
-  danger: ['text-red-500', 'bg-red-500', 'border-red-500'],
+  info: ['text-blue-500', 'bg-blue-500', thinBorder],
+  warning: ['text-yellow-500', 'bg-accentalt', thinBorder],
+  danger: ['text-red-500', 'bg-red-500', thinBorder],
 };
 const sizes: Record<SizeNames, string[]> = {
   large: ['px-7 sm:px-9 h-11 sm:h-13', 'w-11 h-11 sm:w-13 sm:h-13'],
@@ -128,7 +128,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           'relative inline-flex shrink-0 items-center justify-center overflow-hidden text-center text-xs font-medium tracking-wider outline-none transition-all sm:text-sm',
           !disabled
             ? buttonColorClassNames
-            : 'cursor-not-allowed bg-gray-100 text-gray-400',
+            : cn('cursor-not-allowed bg-gray-100 text-gray-400', thinBorder),
           disabled || isLoading || variant === 'transparent'
             ? ''
             : 'hover:-translate-y-0.5 hover:shadow-large focus:-translate-y-0.5 focus:shadow-large focus:outline-none',
