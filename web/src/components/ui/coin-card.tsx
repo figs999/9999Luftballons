@@ -119,6 +119,14 @@ interface CoinSliderProps {
 
 export default function CoinSlider({ coins }: CoinSliderProps) {
   const sliderBreakPoints = {
+    0: {
+      slidesPerView: 1,
+      spaceBetween: 20
+    },
+    480: {
+      slidesPerView: 2,
+      spaceBetween: 20
+    },
     768: {
       slidesPerView: 3,
       spaceBetween: 20,
@@ -146,8 +154,6 @@ export default function CoinSlider({ coins }: CoinSliderProps) {
       {coins.length > 0 ? (
         <Swiper
           modules={[Scrollbar, A11y]}
-          spaceBetween={24}
-          slidesPerView={5}
           scrollbar={{ draggable: true }}
           breakpoints={sliderBreakPoints}
           observer={true}
