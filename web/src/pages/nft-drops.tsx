@@ -262,7 +262,7 @@ function Filters() {
 export function DrawerFilters() {
   const { closeDrawer } = useDrawer();
   return (
-    <div className="relative w-full max-w-full bg-white dark:bg-dark xs:w-80">
+    <div className="relative w-full max-w-full bg-accentalt dark:bg-dark xs:w-80">
       <div className="flex h-20 items-center justify-between overflow-hidden px-6 py-4">
         <h2 className="text-xl font-medium uppercase tracking-wider text-gray-900 dark:text-white">
           Filters
@@ -271,7 +271,7 @@ export function DrawerFilters() {
           shape="circle"
           color="white"
           onClick={closeDrawer}
-          className="dark:bg-light-dark"
+          className="bg-accent dark:bg-light-dark"
         >
           <Close className="h-auto w-3" />
         </Button>

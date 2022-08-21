@@ -133,7 +133,7 @@ export default function TransactionTable() {
 
   return (
     <div className="mt-5">
-      <div className="rounded-tl-lg rounded-tr-lg bg-white px-4 pt-6 dark:bg-light-dark md:px-8 md:pt-8">
+      <div className="rounded-tl-lg rounded-tr-lg bg-accent px-4 pt-6 dark:bg-light-dark md:px-8 md:pt-8">
         <div className="flex flex-col items-center justify-between border-b border-dashed border-gray-200 pb-5 dark:border-gray-700 md:flex-row">
           <h2 className="mb-3 shrink-0 text-lg font-medium uppercase text-black dark:text-white sm:text-xl md:mb-0 md:text-2xl">
             My Luftballons
