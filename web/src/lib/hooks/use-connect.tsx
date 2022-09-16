@@ -749,18 +749,41 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
   const [availableNFTs, setAvailableNFTs] = useState<nft[]>([]);
   const NFT_AvailableNFTs = async function (): Promise<nft[]> {
-    let os_url = `https://api.opensea.io/api/v1/assets?owner=${luftballonsAddress}`;
-    let result = await axios.get(os_url, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    let rawResults = [];
+    let next = "";
+    while(true) {
+      let os_url = `https://api.opensea.io/api/v1/assets?owner=${luftballonsAddress}`;
+      if(next?.length > 0)
+        os_url += "&cursor="+next;
+
+      let result:AxiosResponse = await new Promise( (resolve,err) =>
+          axios.get(os_url, {
+            headers: {
+              'Content-Type': 'application/json',
+              'X-API-KEY': process.env.OPEN_SEA ?? '',
+            },
+          }).then(result =>
+              resolve(result)
+          ).catch(error => err(error))
+      );
+
+      for (let i = 0; i < result.data?.assets?.length; i++) {
+        rawResults.push(result.data.assets[i]);
+      }
+
+      if(result.data?.next == null)
+        break;
+      else
+        next = result.data?.next;
+    }
 
     let nfts: { [add_id: string]: nft } = {};
     let nftIDs: {
       [add_id: string]: { address: string; id: number; date: number };
     } = {};
-    for (let nft of result.data?.assets) {
+
+    for (let i = 0; i < rawResults.length; i++) {
+      let nft = rawResults[i];
       let add_id = nft.asset_contract.address + nft.token_id;
       nfts[add_id] = {
         name: nft.name,
