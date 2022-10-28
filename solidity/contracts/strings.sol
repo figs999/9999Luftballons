@@ -684,7 +684,7 @@ library strings {
      * @param other The second slice to concatenate.
      * @return The concatenation of the two strings.
      */
-    function concat(slice memory self, slice memory other) internal pure returns (string memory) {
+    function concat2(slice memory self, slice memory other) internal pure returns (string memory) {
         string memory ret = new string(self._len + other._len);
         uint retptr;
         assembly { retptr := add(ret, 32) }

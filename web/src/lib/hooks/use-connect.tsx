@@ -112,6 +112,12 @@ export interface IChainData {
   native_currency: IAssetData;
 }
 
+export type CollectionMetadata = {
+  schema_name: string;
+  address: string;
+  token_uri: string;
+}
+
 export type nft = {
   id: number;
   thumbnail_url?: string;
@@ -121,10 +127,12 @@ export type nft = {
   price?: string;
   luft?: number;
   metadata?: any;
-  collection_metadata?: any;
+  collection_metadata: CollectionMetadata;
   date: number;
   ensState?: number;
   harvestableLuft?: number;
+  wrapperCollection?: string;
+  wrapperID?: number;
 };
 
 export type tokenData = {
@@ -155,6 +163,11 @@ export type tokenData = {
   claimable?: number;
   noticed?: number;
 };
+
+export type NFTOwnershipResults = {
+  nfts: { [add_id: string]: nft };
+  nftIDs: { [add_id: string]: { address: string; id: number; date: number } };
+}
 
 export function getChainData(chainId: number): IChainData | undefined {
   const chainData = supportedChains.filter(
@@ -749,32 +762,69 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
   const [availableNFTs, setAvailableNFTs] = useState<nft[]>([]);
   const NFT_AvailableNFTs = async function (): Promise<nft[]> {
+    let owned = await OwnedNFTs(luftballonsAddress);
+
+    let moralisQuery = NFT_GetReceivedDates(owned.nftIDs);
+
+    setAvailableNFTs(Object.values(owned.nfts));
+
+    for (let _nft of Object.values(owned.nfts)) {
+      _nft.luft = await NFT_LuftPerNFT(_nft.collection_metadata.address);
+      setAvailableNFTs(Object.values(owned.nfts));
+    }
+
+    let moralisResult = await moralisQuery;
+
+    for (let add_id of Object.keys(moralisResult)) {
+      owned.nfts[add_id].date = moralisResult[add_id].date;
+    }
+
+    setAvailableNFTs(Object.values(owned.nfts));
+
+    let luftWrappedTax = await OwnedNFTs("0xe3e79802fdbcbb8e69e91d737b1a0bc0410e0633");
+    for (let _wrappedNFT of Object.values(luftWrappedTax.nfts)) {
+      for(let _nft of Object.values(owned.nfts)) {
+        if( _nft.collection_metadata.address == "0xe3e79802fdbcbb8e69e91d737b1a0bc0410e0633" &&
+            _nft.collection_metadata.token_uri == _wrappedNFT.collection_metadata.token_uri) {
+          _wrappedNFT.wrapperCollection = "0xe3e79802fdbcbb8e69e91d737b1a0bc0410e0633";
+          _wrappedNFT.wrapperID = _nft.id;
+          _wrappedNFT.date = _nft.date;
+          _wrappedNFT.luft = _nft.luft;
+          owned.nfts["0xe3e79802fdbcbb8e69e91d737b1a0bc0410e0633" + _nft.id] = _wrappedNFT;
+        }
+      }
+    }
+
+    return Object.values(owned.nfts);
+  };
+
+  const OwnedNFTs = async function (owner: string): Promise<NFTOwnershipResults> {
     let rawResults = [];
     let next = "";
     while(true) {
-      let os_url = `https://api.opensea.io/api/v1/assets?owner=${luftballonsAddress}`;
+      let url = `https://deep-index.moralis.io/api/v2/${owner}/nft?chain=eth&format=decimal`;
       if(next?.length > 0)
-        os_url += "&cursor="+next;
+        url += "&cursor="+next;
 
       let result:AxiosResponse = await new Promise( (resolve,err) =>
-          axios.get(os_url, {
+          axios.get(url, {
             headers: {
               'Content-Type': 'application/json',
-              'X-API-KEY': process.env.OPEN_SEA ?? '',
+              'X-API-KEY': 'GdIYAl2neFgjhFm8HPVsSLoevMVPKGjhwV7e2SnCXIOc9iqIf4ZFuVl3c12jVL28',
             },
           }).then(result =>
               resolve(result)
           ).catch(error => err(error))
       );
 
-      for (let i = 0; i < result.data?.assets?.length; i++) {
-        rawResults.push(result.data.assets[i]);
+      for (let i = 0; i < result.data?.result?.length; i++) {
+        rawResults.push(result.data.result[i]);
       }
 
-      if(result.data?.next == null)
+      if(result.data?.cursor == null)
         break;
       else
-        next = result.data?.next;
+        next = result.data?.cursor;
     }
 
     let nfts: { [add_id: string]: nft } = {};
@@ -784,52 +834,32 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
     for (let i = 0; i < rawResults.length; i++) {
       let nft = rawResults[i];
-      let add_id = nft.asset_contract.address + nft.token_id;
+      let add_id = nft.token_address + nft.token_id;
+      let metadata = JSON.parse(nft.metadata);
       nfts[add_id] = {
-        name: nft.name,
+        name: metadata?.name ?? `${nft.name} #${nft.token_id}`,
         id: nft.token_id,
-        collection: nft.collection.name,
-        thumbnail_url: nft.image_thumbnail_url,
-        image_url: nft.image_url,
-        metadata: nft.traits,
-        collection_metadata: nft.asset_contract,
-        price:
-          'Last Sale: ' +
-          (nft.last_sale
-            ? (+nft.last_sale.total_price *
-                +nft.last_sale.payment_token.eth_price) /
-                10 ** +nft.last_sale.payment_token.decimals +
-              'e'
-            : 'None'),
-        //luft: await NFT_LuftPerNFT(nft.asset_contract.address),
+        collection: nft.name,
+        thumbnail_url: metadata?.image_url,
+        image_url: metadata?.image_url,
+        metadata: metadata?.attributes,
+        collection_metadata: {
+          schema_name: nft.contract_type,
+          address: nft.token_address,
+          token_uri: nft.token_uri
+        },
         date: 0,
       };
 
       nftIDs[add_id] = {
-        address: nft.asset_contract.address,
+        address: nft.token_address,
         id: nft.token_id,
         date: 0,
       };
     }
 
-    let moralisQuery = NFT_GetReceivedDates(nftIDs);
-
-    setAvailableNFTs(Object.values(nfts));
-
-    for (let _nft of Object.values(nfts)) {
-      _nft.luft = await NFT_LuftPerNFT(_nft.collection_metadata.address);
-      setAvailableNFTs(Object.values(nfts));
-    }
-
-    let moralisResult = await moralisQuery;
-
-    for (let add_id of Object.keys(moralisResult)) {
-      nfts[add_id].date = moralisResult[add_id].date;
-    }
-
-    setAvailableNFTs(Object.values(nfts));
-    return Object.values(nfts);
-  };
+    return {nfts, nftIDs};
+  }
 
   const NFT_GetReceivedDates = async function (nftIDs: {
     [add_id: string]: { address: string; id: number; date: number };
