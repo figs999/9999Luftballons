@@ -36,10 +36,9 @@ export default function CollectionCard({ item, className = '' }: CardProps) {
       <div className="relative flex aspect-[8/11] w-full justify-center overflow-hidden rounded-lg">
         <Image
           src={cover_image}
-          placeholder="blur"
-          layout="fill"
+          fill={true}
           quality={100}
-          objectFit="cover"
+          object-fit="cover"
           alt={name}
         />
       </div>

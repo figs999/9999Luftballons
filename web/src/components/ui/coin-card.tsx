@@ -50,9 +50,9 @@ export function CoinCard({
         <Image
             src={logo}
             alt={name}
-            layout="fill"
-            objectFit="contain"
-            objectPosition={0}
+            fill={true}
+            object-fit="contain"
+            object-position={0}
         />
       </div>
       <div className="mt-8 mb-2 text-sm font-medium tracking-wider text-gray-900 lg:text-lg 2xl:text-xl 3xl:text-2xl">

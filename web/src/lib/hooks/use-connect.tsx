@@ -30,7 +30,7 @@ import LUFTImage from '@/assets/images/coin/LUFT.svg';
 import NFTxImage from '@/assets/images/coin/NFTXLUFT.svg';
 import xLUFTImage from '@/assets/images/coin/xLUFT.svg';
 import XLUFTWETH from '@/assets/images/coin/XLUFTWETH.svg';
-import { StaticImageData } from 'next/image';
+import { StaticImageData } from "next/legacy/image";
 import { forEach } from 'lodash';
 import AuthorImage from '@/assets/images/author.jpg';
 import NFT1 from '@/assets/images/nft/nft-1.jpg';
@@ -119,6 +119,7 @@ export type CollectionMetadata = {
 }
 
 export type nft = {
+  unique_id: string;
   id: number;
   thumbnail_url?: string;
   image_url?: string;
@@ -734,7 +735,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
   const ERC20_luftTotalSupply = async function (): Promise<number> {
     const LuftContract = getERC20Contract("0xb9f7dba05880100083278156ab24d5fc036c3bb8");
-    return await LuftContract.totalSupply() / 10**18
+    return (await LuftContract.totalSupply()) / 10**18;
   };
 
   const NFT_LuftPerNFT = async function (
@@ -768,11 +769,6 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
     setAvailableNFTs(Object.values(owned.nfts));
 
-    for (let _nft of Object.values(owned.nfts)) {
-      _nft.luft = await NFT_LuftPerNFT(_nft.collection_metadata.address);
-      setAvailableNFTs(Object.values(owned.nfts));
-    }
-
     let moralisResult = await moralisQuery;
 
     for (let add_id of Object.keys(moralisResult)) {
@@ -781,22 +777,67 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
     setAvailableNFTs(Object.values(owned.nfts));
 
-    let luftWrappedTax = await OwnedNFTs("0xe3e79802fdbcbb8e69e91d737b1a0bc0410e0633");
-    for (let _wrappedNFT of Object.values(luftWrappedTax.nfts)) {
-      for(let _nft of Object.values(owned.nfts)) {
-        if( _nft.collection_metadata.address == "0xe3e79802fdbcbb8e69e91d737b1a0bc0410e0633" &&
-            _nft.collection_metadata.token_uri == _wrappedNFT.collection_metadata.token_uri) {
-          _wrappedNFT.wrapperCollection = "0xe3e79802fdbcbb8e69e91d737b1a0bc0410e0633";
-          _wrappedNFT.wrapperID = _nft.id;
-          _wrappedNFT.date = _nft.date;
-          _wrappedNFT.luft = _nft.luft;
-          owned.nfts["0xe3e79802fdbcbb8e69e91d737b1a0bc0410e0633" + _nft.id] = _wrappedNFT;
+    owned.nfts = await FixWrappedNFTs("0xe3e79802fdbcbb8e69e91d737b1a0bc0410e0633", owned.nfts);
+    owned.nfts = await FixWrappedNFTs("0x566437bcc0a184567a7aece3e95d845f08bc4d06", owned.nfts);
+    owned.nfts = await FixWrappedNFTs("0xa4d8cbc21435795ef6351454e017090166ea0060", owned.nfts);
+
+    setAvailableNFTs(Object.values(owned.nfts));
+
+    for(let _nft of Object.values(owned.nfts)) {
+      if(!_nft.metadata || _nft.collection == "Unknown") {
+        let url = `https://api.opensea.io/api/v1/asset/${_nft.collection_metadata.address}/${_nft.id}/?format=json&include_orders=false`;
+        let result:AxiosResponse = await new Promise( (resolve,err) =>
+            axios.get(url, {
+              headers: {
+                'Content-Type': 'application/json'
+              },
+            }).then(result =>
+                resolve(result)
+            )
+        );
+
+        if(result) {
+          if(!_nft.metadata) {
+            _nft.name = result?.data?.name;
+            _nft.thumbnail_url = result?.data?.image_url;
+            _nft.image_url = result?.data?.image_thumbnail_url;
+            _nft.metadata = result?.data?.traits;
+          }
+          if(_nft.collection == "Unknown") {
+            _nft.collection = result?.data?.collection?.name;
+          }
         }
       }
     }
 
+    setAvailableNFTs(Object.values(owned.nfts));
+
+    for (let _nft of Object.values(owned.nfts)) {
+      _nft.luft = await NFT_LuftPerNFT(_nft.wrapperCollection ?? _nft.collection_metadata.address);
+      setAvailableNFTs(Object.values(owned.nfts));
+    }
+
     return Object.values(owned.nfts);
   };
+
+  const FixWrappedNFTs = async function (wrapper: string, nfts: { [add_id: string]: nft }) : Promise<{ [add_id: string]: nft }> {
+    let luftWrappedTax = await OwnedNFTs(wrapper);
+    for (let _wrappedNFT of Object.values(luftWrappedTax.nfts)) {
+      for(let _nft of Object.values(nfts)) {
+        if( _nft.collection_metadata.address == wrapper &&
+            _nft.collection_metadata.token_uri == _wrappedNFT.collection_metadata.token_uri) {
+          _wrappedNFT.wrapperCollection = wrapper;
+          _wrappedNFT.wrapperID = _nft.id;
+          _wrappedNFT.date = _nft.date;
+          _wrappedNFT.luft = _nft.luft;
+          _wrappedNFT.collection_metadata.schema_name = _nft.collection_metadata.schema_name
+          _wrappedNFT.unique_id = _nft.unique_id;
+          nfts[_wrappedNFT.unique_id] = _wrappedNFT;
+        }
+      }
+    }
+    return nfts;
+  }
 
   const OwnedNFTs = async function (owner: string): Promise<NFTOwnershipResults> {
     let rawResults = [];
@@ -836,13 +877,18 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       let nft = rawResults[i];
       let add_id = nft.token_address + nft.token_id;
       let metadata = JSON.parse(nft.metadata);
+      let img = metadata?.image_url ?? metadata?.image;
+      if(img?.startsWith("ipfs://")) {
+        img = img.replace("ipfs://", "https://ipfs.io/ipfs/")
+      }
       nfts[add_id] = {
+        unique_id: add_id,
         name: metadata?.name ?? `${nft.name} #${nft.token_id}`,
         id: nft.token_id,
-        collection: nft.name,
-        thumbnail_url: metadata?.image_url,
-        image_url: metadata?.image_url,
-        metadata: metadata?.attributes,
+        collection: nft.name ?? "Unknown",
+        thumbnail_url: img,
+        image_url: img,
+        metadata: metadata?.attributes ?? metadata?.traits,
         collection_metadata: {
           schema_name: nft.contract_type,
           address: nft.token_address,
@@ -964,6 +1010,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       ids.push(nft.token_id);
       let luft = await ERC20_claimableLuft([nft.token_id]);
       results.push({
+        unique_id: nft.token_id,
         name: nft.name,
         id: nft.token_id,
         collection: nft.collection.name,

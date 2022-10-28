@@ -64,9 +64,8 @@ function Avatar({
             alt={alt}
             width={width}
             height={height}
-            layout="fill"
-            objectFit="cover"
-            placeholder="blur"
+            fill={true}
+            object-fit="cover"
             className="rounded-full"
           />
         )

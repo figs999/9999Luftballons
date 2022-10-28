@@ -377,7 +377,7 @@ const NFTPage: NextPageWithLayout<
               .sort(sortMethod.func)
               .map((_nft: nft) => (
                 <NFTGrid
-                  key={_nft.collection_metadata.address + _nft.id}
+                  key={_nft.unique_id}
                   id={_nft.id}
                   name={_nft.name}
                   image_url={_nft.image_url}
@@ -388,6 +388,9 @@ const NFTPage: NextPageWithLayout<
                   metadata={_nft.metadata}
                   collection_metadata={_nft.collection_metadata}
                   date={_nft.date}
+                  wrapperCollection={_nft.wrapperCollection}
+                  wrapperID={_nft.wrapperID}
+                  unique_id={_nft.unique_id}
                 />
               ))}
           </div>

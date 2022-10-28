@@ -18,7 +18,10 @@ export default function NFTGrid({
   collection_metadata,
   date,
   ensState,
-  harvestableLuft
+  harvestableLuft,
+  wrapperCollection,
+  wrapperID,
+  unique_id
 }: nft) {
   const {
     txNFT_harvestERC721Airdrop,
@@ -53,10 +56,9 @@ export default function NFTGrid({
           <Image
             className="rounded-xl -translate-y-1"
             src={image_url ?? ''}
-            placeholder="blur"
             blurDataURL={thumbnail_url ?? ''}
-            layout="fill"
-            objectFit="cover"
+            fill={true}
+            object-fit="cover"
             alt=""
           />
         </div>
@@ -81,7 +83,7 @@ export default function NFTGrid({
             Claim NFT
             <div className="mt-2 text-center text-sm font-medium text-gray-900 dark:text-white">
               <Button
-                onClick={() => claimNFT(collection_metadata.address, id)}
+                onClick={() => claimNFT(wrapperCollection??collection_metadata.address, wrapperID??id)}
                 className="shadow-main hover:shadow-large"
                 disabled={userBalances[1] && userBalances[1].balance < luft}
                 color="success"

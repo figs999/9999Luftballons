@@ -32,9 +32,8 @@ export default function NotificationCard({
         <Image
           src={actor.avatar}
           alt={actor.name}
-          placeholder="blur"
-          layout="fill"
-          objectFit="cover"
+          fill={true}
+          object-fit="cover"
         />
       </div>
       <div className="ltr:ml-3 rtl:mr-3 ltr:sm:ml-4 rtl:sm:mr-4">

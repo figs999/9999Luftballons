@@ -46,7 +46,6 @@ export default function TransactionHistoryCard({ item }: { item: CardProps }) {
             alt="wallet"
             width={24}
             height={24}
-            placeholder="blur"
             className="rounded-full"
           />
           <div className="truncate -tracking-wider text-gray-900 ltr:ml-2 rtl:mr-2 dark:text-white">
@@ -115,7 +114,6 @@ export default function TransactionHistoryCard({ item }: { item: CardProps }) {
                   width={40}
                   height={40}
                   className="rounded-full"
-                  placeholder="blur"
                 />
               ) : (
                 <QuestionIcon className="h-5 w-5 xl:h-6 xl:w-6" />
