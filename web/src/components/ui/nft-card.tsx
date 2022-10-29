@@ -20,8 +20,7 @@ export default function NFTGrid({
   ensState,
   harvestableLuft,
   wrapperCollection,
-  wrapperID,
-  unique_id
+  wrapperID
 }: nft) {
   const {
     txNFT_harvestERC721Airdrop,
